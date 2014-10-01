@@ -1,104 +1,112 @@
-install virtualenv
+Setup virtualenv
 ==================
-$ sudo apt-get install python-pip
-$ sudo pip install virtualenvwrapper
 
-add flowing to .bashrc
+install pip and virtualenvwrapper::
 
-export WORKON_HOME=$HOME/.virtualenvs
-export PROJECT_HOME=$HOME/project
-source /usr/local/bin/virtualenvwrapper.sh
+    $ sudo apt-get install python-pip
+    $ sudo pip install virtualenvwrapper
+
+add flowing to ~/.bashrc::
+
+    export WORKON_HOME=$HOME/.virtualenvs
+    export PROJECT_HOME=$HOME/project
+    source /usr/local/bin/virtualenvwrapper.sh
 
 reload .bashrc
 
-$ cd project
-$ mkvirtualenv legohole
+creat virtualenv::
 
-shuld see:(legohole)dormouse@dormouse-OptiPlex-360 ~ $ 
+    $ cd project
+    $ mkvirtualenv legohole
 
-out virtualenv:deactivate
-in virtualenv:workon django_project
+you should see somethine like::
 
-install django
+    (legohole)dormouse@dormouse ~ $ 
+
+usage::
+    out virtualenv:deactivate
+    in virtualenv:workon django_project
+
+Setup django
 ==============
 
-$ pip install django
+install django::
 
-confirm install
+    $ pip install django
 
-$ which django-admin.py
+confirm install::
+
+    $ which django-admin.py
+
 should see:/home/dormouse/.virtualenvs/legohole/bin/django-admin.py
-
 
 setup git
 =========
-sudo apt-get install git
-git config --global user.name "Dormouse Young"
-git config --global user.email "dormouse.young@gmail.com"
-ssh-keygen -t rsa -C "dormouse.young@gmail.com"
 
-Then add your new key to the ssh-agent:
+install git::
 
-# start the ssh-agent in the background
-eval "$(ssh-agent -s)"
-# Agent pid 59566
-ssh-add ~/.ssh/id_rsa
+    sudo apt-get install git
 
-Copies the contents of the id_rsa.pub file to your clipboard
+config git::
 
-add to https://github.com/settings/ssh
+    git config --global user.name "Dormouse Young"
+    git config --global user.email "dormouse.young@gmail.com"
+    ssh-keygen -t rsa -C "dormouse.young@gmail.com"
+
+Then add your new key to the ssh-agent::
+
+    # start the ssh-agent in the background
+    eval "$(ssh-agent -s)"
+    # Agent pid XX566
+    ssh-add ~/.ssh/id_rsa
+
+Add the contents of the id_rsa.pub file to https://github.com/settings/ssh
 
 test ssh::
 
     ssh -T git@github.com
 
-should see hi dormouse
-
-git usage::
-
-    …or create a new repository on the command line
-
-    touch README.md
-    git init
-    git add README.md
-    git commit -m "first commit"
-    git remote add origin git@github.com:dormouse/legohole.git
-    git push -u origin master
-
-    …or push an existing repository from the command line
-
-    git remote add origin git@github.com:dormouse/legohole.git
-    git push -u origin master
-
-start project
-=============
-
-cd project
-
-django-admin.py startproject legohole
-
-git init
-git add django_project
-git commit -m 'Initial commit of legohole'
-
-
-pip install south
-
-
-creat .gitignore::
-
-*.pyc
-.*swp
-
-pip freeze > requirements.txt
+should see "hi dormouse"
 
 check befort push::
 
     git status
 
+start project
+=============
+
+creat project::
+
+    cd project
+    django-admin.py startproject legohole
+
+push to github::
+
+    git init
+    git add legohole
+    git commit -m 'Initial commit of legohole'
+    git remote add origin git@github.com:dormouse/legohole.git
+    git push -u origin master
+
+install south::
+
+    pip install south
+
+
+creat .gitignore file include::
+
+    *.pyc
+    .*swp
+
+freeze requirements::
+
+    pip freeze > requirements.txt
 
 
 
+
+
+----
 参考：http://www.jeffknupp.com/blog/2013/12/18/starting-a-django-16-project-the-right-way/
 
 
