@@ -80,19 +80,6 @@ creat project::
     cd project
     django-admin.py startproject legohole
 
-push to github::
-
-    git init
-    git add legohole
-    git commit -m 'Initial commit of legohole'
-    git remote add origin git@github.com:dormouse/legohole.git
-    git push -u origin master
-
-install south::
-
-    pip install south
-
-
 creat .gitignore file include::
 
     *.pyc
@@ -102,7 +89,24 @@ freeze requirements::
 
     pip freeze > requirements.txt
 
+push to github::
 
+    git init
+    git add legohole
+    git commit -m 'Initial commit of legohole'
+    git remote add origin git@github.com:dormouse/legohole.git
+    git push -u origin master
+
+
+start setsapp
+=============
+
+creat setsapp::
+
+    ./manage.py startapp setsapp
+    ./manage.py schemamigration setsapp --initial
+    ./manage.py migrate setsapp
+    ./manage.py schemamigration setsapp --auto
 
 
 
