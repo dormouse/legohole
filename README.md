@@ -24,6 +24,7 @@ you should see somethine like::
     (legohole)dormouse@dormouse ~ $ 
 
 usage::
+
     out virtualenv:deactivate
     in virtualenv:workon django_project
 
