@@ -26,7 +26,7 @@ you should see somethine like::
 usage::
 
     out virtualenv:deactivate
-    in virtualenv:workon django_project
+    in virtualenv:workon legohole
 
 Setup django
 ==============
