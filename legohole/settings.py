@@ -12,6 +12,6 @@ BOT_NAME = 'legohole'
 
 SPIDER_MODULES = ['legohole.spiders']
 NEWSPIDER_MODULE = 'legohole.spiders'
-
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'legohole (+http://www.yourdomain.com)'
+DOWNLOAD_DELAY = 2
