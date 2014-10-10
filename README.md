@@ -110,6 +110,26 @@ creat setsapp::
     ./manage.py schemamigration setsapp --auto
 
 
+start scrapy
+============
+
+安装编译环境::
+
+    sudo apt-get install build-essential python-dev
+    sudo apt-get install libssl-dev libffi-dev libxml2-dev
+    sudo apt-get install libxslt1-dev libxslt-dev 
+    pip install service_identity
+    #sudo apt-get install python-libxml
+    sudo ln -s /usr/include/libxml2/libxml   /usr/include/libxml 
+
+安装 Scrapy::
+
+    easy_install -U Scrapy or pip install Scrapy
+
+新建一个项目::
+
+    scrapy startproject tutorial
+    scrapy genspider bb9800 bb9800.diandian.com
 
 ----
 参考：http://www.jeffknupp.com/blog/2013/12/18/starting-a-django-16-project-the-right-way/
