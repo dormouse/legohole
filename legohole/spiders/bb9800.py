@@ -28,8 +28,31 @@ class Bb9800Spider(scrapy.Spider):
                 #get date
                 day = self._get_text(post, 'div[@class="date"]/span/text()')
                 month = self._get_text(post, 'div[@class="date"]/text()')
-                print day
-                print month
+                
+                entry = post.xpath('div[@class="entry"][1]')
+                #get content
+                contents = entry.xpath('.//img|p')
+                img_p_list = []
+                for content in contents:
+                    if content.xpath('name()').extract()[0] == u'img':
+                        img_p = self._get_text(content, '@src')
+                    else:
+                        img_p = self._get_text(content, 'text()')
+                    if img_p:
+                        img_p_list.append(img_p)
+
+                #不包含img
+                #//h1[not(descendant::img)]
+
+                #get tags
+                tags = entry.xpath('div[@class="tags"]//span/text()').extract()
+
+                print "===no title start==="
+                print month, day
+                for content in img_p_list:
+                    print content
+                print 'tag:', ','.join(tags)
+                print "===no title end==="
 
 
 
