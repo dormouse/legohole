@@ -3,8 +3,8 @@ Setup virtualenv
 
 install pip and virtualenvwrapper::
 
-    $ sudo apt-get install python-pip
-    $ sudo pip install virtualenvwrapper
+    sudo apt-get install python-pip
+    sudo pip install virtualenvwrapper
 
 add flowing to ~/.bashrc::
 
@@ -16,8 +16,8 @@ reload .bashrc
 
 creat virtualenv::
 
-    $ cd project
-    $ mkvirtualenv legohole
+    cd project
+    mkvirtualenv legohole
 
 you should see somethine like::
 
@@ -33,11 +33,11 @@ Setup django
 
 install django::
 
-    $ pip install django
+    pip install django
 
 confirm install::
 
-    $ which django-admin.py
+    which django-admin.py
 
 should see:/home/dormouse/.virtualenvs/legohole/bin/django-admin.py
 
@@ -120,7 +120,7 @@ start scrapy
     sudo apt-get install libxslt1-dev libxslt-dev 
     pip install service_identity
     #sudo apt-get install python-libxml
-    sudo ln -s /usr/include/libxml2/libxml   /usr/include/libxml 
+    #sudo ln -s /usr/include/libxml2/libxml   /usr/include/libxml 
 
 安装 Scrapy::
 
