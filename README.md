@@ -117,8 +117,8 @@ start scrapy
 
     sudo apt-get install build-essential python-dev
     sudo apt-get install libssl-dev libffi-dev libxml2-dev
-    sudo apt-get install libxslt1-dev libxslt-dev 
-    pip install service_identity
+    sudo apt-get install libxslt1-dev libxslt-dev libjpeg-dev 
+    pip install service_identity pillow
     #sudo apt-get install python-libxml
     #sudo ln -s /usr/include/libxml2/libxml   /usr/include/libxml 
 

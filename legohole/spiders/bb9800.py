@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import scrapy
+from legohole.items import LegoholeItem
 
 
 class Bb9800Spider(scrapy.Spider):
@@ -35,7 +36,12 @@ class Bb9800Spider(scrapy.Spider):
                 img_p_list = []
                 for content in contents:
                     if content.xpath('name()').extract()[0] == u'img':
-                        img_p = self._get_text(content, '@src')
+                        #img_p = self._get_text(content, '@src')
+                        img_p = content.xpath('@src').extract()
+                        item = LegoholeItem()
+                        item['image_urls'] = img_p
+                        item['images'] = content.xpath('@src').re(r'[^/]*.[jpg|png|gif]$')
+                        yield item
                     else:
                         img_p = self._get_text(content, 'text()')
                     if img_p:
