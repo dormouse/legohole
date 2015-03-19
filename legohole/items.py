@@ -9,8 +9,8 @@ import scrapy
 
 
 class LegoholeItem(scrapy.Item):
-    title = scrapy.Field()
-    link = scrapy.Field()
+    time = scrapy.Field()
+    tags = scrapy.Field()
 
     # define the fields for your item here like:
     # name = scrapy.Field()

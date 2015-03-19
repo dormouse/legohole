@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=gbk">
+	<title>Diandian</title>
+</head>
+<body>
+
+<script>
+	if(!(document.cookie.indexOf('fs=diandian') > -1) && !(window.navigator.userAgent.indexOf('Safari') > -1 && window.navigator.userAgent.indexOf('Chrome') == -1)){
+		form = document.createElement('form');
+		form.action = 'http://' + location.host + '/blank.html';
+		form.method = 'POST';
+		document.body.appendChild(form);
+		form.submit();
+	}
+</script>
+
+</body></html>

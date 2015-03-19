@@ -34,3 +34,8 @@ DOWNLOADER_MIDDLEWARES = {
     'scrapy.contrib.downloadermiddleware.useragent.UserAgentMiddleware': 400,
     'scrapy.contrib.downloadermiddleware.cookies.CookiesMiddleware':700,
 }
+
+ITEM_PIPELINES = {
+    'legohole.pipelines.LegoholePipeline': 300,
+    #'myproject.pipelines.JsonWriterPipeline': 800,
+}
