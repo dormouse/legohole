@@ -29,11 +29,12 @@ DEFAULT_REQUEST_HEADERS={
     'Accept-Language': 'en',
     'X-JAVASCRIPT-ENABLED': 'true',
 }
- 
+""" 
 DOWNLOADER_MIDDLEWARES = {
     'scrapy.contrib.downloadermiddleware.useragent.UserAgentMiddleware': 400,
     'scrapy.contrib.downloadermiddleware.cookies.CookiesMiddleware':700,
 }
+"""
 
 ITEM_PIPELINES = {
     'legohole.pipelines.LegoholePipeline': 300,

@@ -9,6 +9,7 @@ import scrapy
 
 
 class LegoholeItem(scrapy.Item):
+<<<<<<< HEAD
     time = scrapy.Field()
     tags = scrapy.Field()
 
