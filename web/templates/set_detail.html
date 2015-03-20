@@ -1,21 +1,25 @@
 {% extends "layout.html" %}
 
 {% block content %}
-    <div class="container-fluid">
-      <div class="row">
+<div class="container-fluid">
+    <div class="row">
         <div class="col-md-3 sidebar">
-          <ul class="nav nav-sidebar">
+            <table class="table table-striped">
             {% for item in objs.show_items %}
-            <li><a href="">{{ item.name }}:{{ item.value }}</a></li>
-            {% endfor %}
-          </ul>
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.value }}</td>
+                </tr>
+                {% endfor %}
+            </table>
         </div>
         <div class="col-md-9 col-md-offset-3 main">
-          <h1 class="page-header">图片</h1>
-          <div class="row placeholders">
-            <img src="{{ objs.img_url }}" alt="image">
-          </div>
+            <h1 class="page-header">图片</h1>
         </div>
-      </div>
+        <div class="row placeholders">
+            <img src="{{ objs.img_url }}" alt="image">
+        </div>
+        </div>
     </div>
+</div>
 {% endblock %}

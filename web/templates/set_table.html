@@ -1,0 +1,24 @@
+{% if sets %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>编号</th>
+            <th>名称</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for set in sets %}
+        <tr>
+            <td>
+                <a href = "/set/id/{{ set.id }}">
+                    {{ set.number }}-{{ set.variant }}
+                </a>
+            </td>
+            <td>{{ set.name }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<em>啥也找不到啊。。。</em>
+{% endif %}
