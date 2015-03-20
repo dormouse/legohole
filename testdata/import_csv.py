@@ -6,7 +6,7 @@ import glob
 from datetime import datetime
 def init_db():
     cx = sqlite.connect("test.db")
-    cx.execute("drop table brickset")
+    cx.execute("drop table if exists brickset")
     init_sql = """create table brickset (
             id integer primary key,
             setid text,

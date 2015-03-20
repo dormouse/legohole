@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-3 sidebar">
+          <ul class="nav nav-sidebar">
+            {% for item in objs.show_items %}
+            <li><a href="">{{ item.name }}:{{ item.value }}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div class="col-md-9 col-md-offset-3 main">
+          <h1 class="page-header">图片</h1>
+          <div class="row placeholders">
+            <img src="{{ objs.img_url }}" alt="image">
+          </div>
+        </div>
+      </div>
+    </div>
+{% endblock %}
