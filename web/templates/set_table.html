@@ -1,20 +1,21 @@
-{% if sets %}
+{% if objs.table_body %}
 <table class="table table-striped">
     <thead>
         <tr>
-            <th>编号</th>
-            <th>名称</th>
+            {% for item in objs.table_head %}
+            <th>{{ item }}</th>
+            {% endfor %}
         </tr>
     </thead>
     <tbody>
-        {% for set in sets %}
+        {% for row in objs.table_body %}
         <tr>
             <td>
-                <a href = "/set/id/{{ set.id }}">
-                    {{ set.number }}-{{ set.variant }}
-                </a>
+                <a href = "/set/id/{{ row[0] }}">{{ row[1] }}</a>
             </td>
-            <td>{{ set.name }}</td>
+            {% for item in row[2:] %}
+            <td>{{ item }}</td>
+            {% endfor %}
         </tr>
         {% endfor %}
     </tbody>

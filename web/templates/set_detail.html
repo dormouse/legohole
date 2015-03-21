@@ -17,7 +17,12 @@
             <h1 class="page-header">图片</h1>
         </div>
         <div class="row placeholders">
-            <img src="{{ objs.img_url }}" alt="image">
+            {% if objs.img_url %}
+            <img src="{{ objs.img_url }}" alt="正在载入">
+            {% else %}
+            <img src="{{ url_for('static', filename='blankbox.gif') }}"
+                alt="暂无图片">
+            {% endif %}
         </div>
         </div>
     </div>

@@ -1,6 +1,13 @@
 # !/usr/bin/env python
 # -*- coding: UTF-8 -*
 
+#TODO:
+#  cache image
+#  get update info
+#  get current price
+#  get minifig info
+#  get piece info
+
 import sqlite3
 import os
 from flask import Flask, request, session, g, redirect, url_for, abort, \
@@ -29,11 +36,35 @@ def teardown_request(exception):
     if hasattr(g, 'db'):
         g.db.close()
 
+def get_sets_table(sql):
+    rows = query_db(sql)
+    objs = {}
+
+    objs['table_head'] = [ u'编号', u'名称', u'系列', u'子系列', u'价格', 
+                u'年份', u'人仔']
+
+    objs['table_body'] = []
+    for row in rows:
+        row['price'] = '|'.join([item for item in [
+            u'$'+row['usprice'] if row['usprice'] else '',
+            u'£'+row['ukprice'] if row['ukprice'] else '',
+            u'€'+row['euprice'] if row['euprice'] else '',
+            ] if item])
+        row['price'] = row['price'] if row['price'] else u'无'
+        row['subtheme'] = row['subtheme'] if row['subtheme'] else u'无'
+        row['minifigs'] = row['minifigs'] if row['minifigs'] else u'无'
+        show_items = [ row['id'], row['number']+'-'+row['variant'],
+                row['name'], row['theme'], row['subtheme'],
+                row['price'], row['year'], row['minifigs']]
+        objs['table_body'].append(show_items)
+    return objs
+    
+
 @app.route('/')
 def index():
     sql = 'select * from brickset order by add_time desc limit 10'
-    sets = query_db(sql)
-    return render_template('index.html', sets=sets)
+    objs = get_sets_table(sql)
+    return render_template('index.html', objs=objs)
 
 @app.route('/set/number/<set_number>')
 def sets_by_number(set_number):
@@ -123,8 +154,8 @@ def search():
                     "'%"+request.form['setnumber']+"%'",
                     'order by number',
                     ])
-            sets = query_db(sql)
-            return render_template('set_list.html', sets=sets)
+            objs = get_sets_table(sql)
+            return render_template('set_list.html', objs=objs)
 
 if __name__ == '__main__':
     app.run(debug=True)
