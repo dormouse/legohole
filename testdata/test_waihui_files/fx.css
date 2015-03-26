@@ -1,0 +1,51 @@
+﻿.contentshow .data { margin: 0 auto; background-color: #D9D9D9; }
+
+.contentshow .data td { height: 26px; line-height: 26px; font-size: 14px; color: #333333; background-color: #FFFFFF; padding: 0 4px; }
+.contentshow .data td.head { text-align: center; background-image: url(../Images/list_head_bg.jpg); background-repeat: repeat-x; color: #CC0000; }
+
+.contentshow .data a { font-size: 14px; }
+.contentshow .data a:link { color: #333333; text-decoration: none; }
+.contentshow .data a:visited { color: #333333; text-decoration: none; }
+.contentshow .data a:hover { color: #FF0000; text-decoration: none; }
+.contentshow .tip { display: block; margin-top: 8px; text-align: center; width: 100%; color: #333333; }
+.contentshow .downerror { display: block; margin-top: 12px; padding: 0 8px; color: #FF0000; line-height: 18px; font-size: 14px; }
+.fxsearchbar { margin: 12px auto; width: 100%; color: #333333; text-align: center; }
+
+.contentshow .box .fxsearchbar td { font-size: 12px; }
+
+
+.fontsmall .data td { height: 26px; line-height: 26px; font-size: 12px; color: #333333; background-color: #FFFFFF; padding: 0 4px; }
+.fontsmall .data a { font-size: 12px; }
+.fontsmall .downerror {font-size: 12px; }
+.fontsmall .box .fxsearchbar td { font-size: 12px; }
+
+
+.fxChartBox { width: 720px; margin: 0 auto; text-align: center; }
+
+.fxsearchbar .inputarea { width: 95px; }
+.red { color: Red; }
+.green { color: Green; }
+
+.quotebox { width: 740px; margin: 6px auto 10px auto; line-height:14pt;  color:Black; text-align:left; }
+.line {font-family:"微软雅黑"; border:solid 1px #d9d9d9; line-height:22px;}
+.alterline {background-color:#d8ebeb;  font-family:"微软雅黑"; border:solid 1px #d9d9d9; line-height:22px;}
+.headerline { background-color:#c00000; font-weight:bold; color:#FFFFFF; font-size:9pt; border:solid 1px #d9d9d9;}
+.firstCol { padding-left:5px;}
+
+.maincontent .left .hq { height: 199px; }
+.maincontent .left .quote { height: 1540px; }
+
+.searchbar { width: 182px; overflow: hidden; }
+.searchbar .arrow { float: left; display: inline; margin: 20px 0 0 5px; width: 4px; height: 7px; background: url(../Images/arrow.jpg) no-repeat; }
+.searchbar .text { float: left; display: inline; color: #1E1E1E; font-size: 14px; margin: 16px 0 0 1px; }
+.searchbar select { padding: 3px 0; float: left; font-size: 14px; margin: 10px 0 0 0; }
+.chartbox { margin: 0 auto; width: 168px; float:left; overflow:hidden; }
+
+.fontbold { font-weight: bold; }
+
+#realrateInfo { margin-top: 12px; }
+#realrateInfo .green, #realrateInfo .red { font-size: 14px; }
+
+.Refresh { text-align:center; font-weight:bold; font-style:normal; font-variant:normal; height:24px; line-height:24px; }
+.Refresh a:link{ cursor:pointer; font-size:13px; color:#660068; text-decoration:underline; }
+.Refresh span {font-size:13px; font-family:"宋体";}
