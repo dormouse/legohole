@@ -1,0 +1,162 @@
+
+<section class="buy">
+<table class="neattable amazon">
+<tr>
+<th></th>
+<th class="hideonsmallscreen"></th>
+<th>Current price</th>
+<th>Retail price</th>
+<th>Min. price</th>
+<th>Discount</th>
+<th></th>
+</tr>
+<tr>
+<td><img src="http://images.brickset.com/flags/UK.png"/></td>
+<td class="hideonsmallscreen">
+<a href="http://www.amazon.co.uk/gp/product/B00I4IYOCA/ref=as_li_ss_tl?ie=UTF8&amp;amp;tag=brickset-21&amp;amp;linkCode=as2&amp;amp;camp=1634&amp;amp;creative=19450&amp;amp;creativeASIN=B00I4IYOCA">
+<img src="/assets/images/vendors/amazon/UK.gif" alt=""/></a>
+</td>
+<td>
+<span class="disc">£10.99</span><br/>
+(£10.99 + £0.00)
+</td>
+<td>£17.99</td>
+<td>£10.99<br/>
+<a onclick="return hs.htmlExpand(this, { objectType: 'iframe', width: 850, height: 500} )" href="/ajax/shopping/amazonGraph.aspx?Country=UK&ASIN=B00I4IYOCA">
+<img src="/assets/images/icons/famfamfam/chart_curve.png"/>
+</a>
+</td>
+<td class="disc">
+39%
+</td>
+<td><a class="buynow" href="http://www.amazon.co.uk/gp/product/B00I4IYOCA/ref=as_li_ss_tl?ie=UTF8&amp;amp;tag=brickset-21&amp;amp;linkCode=as2&amp;amp;camp=1634&amp;amp;creative=19450&amp;amp;creativeASIN=B00I4IYOCA">Buy now</a></td>
+</tr>
+<tr>
+<td><img src="http://images.brickset.com/flags/CA.png"/></td>
+<td class="hideonsmallscreen">
+<a href="http://www.amazon.ca/gp/product/B00J4S792G/ref=as_li_ss_tl?ie=UTF8&amp;amp;tag=brickset0b-20&amp;amp;linkCode=as2&amp;amp;camp=217145&amp;amp;creative=399373&amp;amp;creativeASIN=B00J4S792G">
+<img src="/assets/images/vendors/amazon/CA.gif" alt=""/></a>
+</td>
+<td>
+<span class="disc">$24.95</span><br/>
+($24.95 + $0.00)
+</td>
+<td>$24.99</td>
+<td>$19.97<br/>
+<a onclick="return hs.htmlExpand(this, { objectType: 'iframe', width: 850, height: 500} )" href="/ajax/shopping/amazonGraph.aspx?Country=CA&ASIN=B00J4S792G">
+<img src="/assets/images/icons/famfamfam/chart_curve.png"/>
+</a>
+</td>
+<td class="disc">
+0%
+</td>
+<td><a class="buynow" href="http://www.amazon.ca/gp/product/B00J4S792G/ref=as_li_ss_tl?ie=UTF8&amp;amp;tag=brickset0b-20&amp;amp;linkCode=as2&amp;amp;camp=217145&amp;amp;creative=399373&amp;amp;creativeASIN=B00J4S792G">Buy now</a></td>
+</tr>
+<tr>
+<td><img src="http://images.brickset.com/flags/FR.png"/></td>
+<td class="hideonsmallscreen">
+<a href="http://www.amazon.fr/gp/product/B00I4IYOCA/ref=as_li_ss_tl?ie=UTF8&amp;amp;tag=brickset00-21&amp;amp;linkCode=as2&amp;amp;camp=1642&amp;amp;creative=19458&amp;amp;creativeASIN=B00I4IYOCA">
+<img src="/assets/images/vendors/amazon/FR.gif" alt=""/></a>
+</td>
+<td>
+<span class="disc">€17.09</span><br/>
+(€17.09 + €0.00)
+</td>
+<td>€19.99</td>
+<td>€14.65<br/>
+<a onclick="return hs.htmlExpand(this, { objectType: 'iframe', width: 850, height: 500} )" href="/ajax/shopping/amazonGraph.aspx?Country=FR&ASIN=B00I4IYOCA">
+<img src="/assets/images/icons/famfamfam/chart_curve.png"/>
+</a>
+</td>
+<td class="disc">
+15%
+</td>
+<td><a class="buynow" href="http://www.amazon.fr/gp/product/B00I4IYOCA/ref=as_li_ss_tl?ie=UTF8&amp;amp;tag=brickset00-21&amp;amp;linkCode=as2&amp;amp;camp=1642&amp;amp;creative=19458&amp;amp;creativeASIN=B00I4IYOCA">Buy now</a></td>
+</tr>
+<tr>
+<td><img src="http://images.brickset.com/flags/ES.png"/></td>
+<td class="hideonsmallscreen">
+<a href="http://www.amazon.es/gp/product/B00I4IYOCA/ref=as_li_ss_tl?ie=UTF8&amp;amp;tag=gl0d-21&amp;amp;linkCode=as2&amp;amp;camp=3626&amp;amp;creative=24822&amp;amp;creativeASIN=B00I4IYOCA">
+<img src="/assets/images/vendors/amazon/ES.gif" alt=""/></a>
+</td>
+<td>
+<span class="disc">€16.99</span><br/>
+(€16.99 + €0.00)
+</td>
+<td>€19.99</td>
+<td>€14.98<br/>
+<a onclick="return hs.htmlExpand(this, { objectType: 'iframe', width: 850, height: 500} )" href="/ajax/shopping/amazonGraph.aspx?Country=ES&ASIN=B00I4IYOCA">
+<img src="/assets/images/icons/famfamfam/chart_curve.png"/>
+</a>
+</td>
+<td class="disc">
+15%
+</td>
+<td><a class="buynow" href="http://www.amazon.es/gp/product/B00I4IYOCA/ref=as_li_ss_tl?ie=UTF8&amp;amp;tag=gl0d-21&amp;amp;linkCode=as2&amp;amp;camp=3626&amp;amp;creative=24822&amp;amp;creativeASIN=B00I4IYOCA">Buy now</a></td>
+</tr>
+<tr>
+<td><img src="http://images.brickset.com/flags/DE.png"/></td>
+<td class="hideonsmallscreen">
+<a href="http://www.amazon.de/gp/product/B00I4IYOCA/ref=as_li_ss_tl?ie=UTF8&amp;amp;tag=brickset0c-21&amp;amp;linkCode=as2&amp;amp;camp=1638&amp;amp;creative=19454&amp;amp;creativeASIN=B00I4IYOCA">
+<img src="/assets/images/vendors/amazon/DE.gif" alt=""/></a>
+</td>
+<td>
+<span class="disc">€17.99</span><br/>
+(€17.99 + €0.00)
+</td>
+<td>€19.99</td>
+<td>€14.98<br/>
+<a onclick="return hs.htmlExpand(this, { objectType: 'iframe', width: 850, height: 500} )" href="/ajax/shopping/amazonGraph.aspx?Country=DE&ASIN=B00I4IYOCA">
+<img src="/assets/images/icons/famfamfam/chart_curve.png"/>
+</a>
+</td>
+<td class="disc">
+10%
+</td>
+<td><a class="buynow" href="http://www.amazon.de/gp/product/B00I4IYOCA/ref=as_li_ss_tl?ie=UTF8&amp;amp;tag=brickset0c-21&amp;amp;linkCode=as2&amp;amp;camp=1638&amp;amp;creative=19454&amp;amp;creativeASIN=B00I4IYOCA">Buy now</a></td>
+</tr>
+<tr>
+<td><img src="http://images.brickset.com/flags/IT.png"/></td>
+<td class="hideonsmallscreen">
+<a href="http://www.amazon.it/gp/product/B00I4IYOCA/ref=as_li_ss_tl?ie=UTF8&amp;amp;tag=gl00-21&amp;amp;linkCode=as2&amp;amp;camp=3370&amp;amp;creative=24114&amp;amp;creativeASIN=B00I4IYOCA">
+<img src="/assets/images/vendors/amazon/IT.gif" alt=""/></a>
+</td>
+<td>
+<span class="disc">€17.39</span><br/>
+(€17.39 + €0.00)
+</td>
+<td>€19.99</td>
+<td>€13.99<br/>
+<a onclick="return hs.htmlExpand(this, { objectType: 'iframe', width: 850, height: 500} )" href="/ajax/shopping/amazonGraph.aspx?Country=IT&ASIN=B00I4IYOCA">
+<img src="/assets/images/icons/famfamfam/chart_curve.png"/>
+</a>
+</td>
+<td class="disc">
+13%
+</td>
+<td><a class="buynow" href="http://www.amazon.it/gp/product/B00I4IYOCA/ref=as_li_ss_tl?ie=UTF8&amp;amp;tag=gl00-21&amp;amp;linkCode=as2&amp;amp;camp=3370&amp;amp;creative=24114&amp;amp;creativeASIN=B00I4IYOCA">Buy now</a></td>
+</tr>
+<tr>
+<td><img src="http://images.brickset.com/flags/US.png"/></td>
+<td class="hideonsmallscreen">
+<a href="http://www.amazon.com/gp/product/B00J4S792G/ref=as_li_ss_tl?ie=UTF8&amp;amp;tag=brickset-20&amp;amp;linkCode=as2&amp;amp;camp=217145&amp;amp;creative=399373&amp;amp;creativeASIN=B00J4S792G">
+<img src="/assets/images/vendors/amazon/US.gif" alt=""/></a>
+</td>
+<td>
+<span class="disc">$16.52</span><br/>
+($16.52 + $0.00)
+</td>
+<td>$19.99</td>
+<td>$15.52<br/>
+<a onclick="return hs.htmlExpand(this, { objectType: 'iframe', width: 850, height: 500} )" href="/ajax/shopping/amazonGraph.aspx?Country=US&ASIN=B00J4S792G">
+<img src="/assets/images/icons/famfamfam/chart_curve.png"/>
+</a>
+</td>
+<td class="disc">
+17%
+</td>
+<td><a class="buynow" href="http://www.amazon.com/gp/product/B00J4S792G/ref=as_li_ss_tl?ie=UTF8&amp;amp;tag=brickset-20&amp;amp;linkCode=as2&amp;amp;camp=217145&amp;amp;creative=399373&amp;amp;creativeASIN=B00J4S792G">Buy now</a></td>
+</tr>
+</table>
+</section>
+
