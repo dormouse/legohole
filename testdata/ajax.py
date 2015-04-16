@@ -86,6 +86,115 @@ def parse_price(html):
 
     return prices
 
+def test_set_txt():
+    with open('70155-1.html') as f:
+        datas = parse_set(f.read())
+
+def clean(txt):
+    if txt:
+        return txt.strip()
+    else:
+        return None
+
+def parse_set(html):
+    soup = BeautifulSoup(html)
+    divs = soup.find_all('div', class_='text')
+    # get set details
+    dts = divs[0].find_all('dt')
+    dds = divs[0].find_all('dd')
+    dt_strings = [clean(dt.string) for dt in dts]
+    dd_strings = [clean(dd.string) for dd in dds]
+    set_details = dict(zip(dt_strings, dd_strings))
+    print dt_strings.index('Minifigs')
+    print 'price' in dt_strings
+    if 'Tags' in dt_strings:
+        dd = dds[dt_strings.index('Tags')]
+        alist = dd.find_all('a')
+        tags = []
+        for a in alist:
+            tags.append({'link':a['href'],
+                         'name':clean(a.string)})
+        set_details['Tags'] = tags
+
+    if 'Pieces' in dt_strings:
+        dd = dds[dt_strings.index('Pieces')]
+        set_details['Pieces'] = {'count':int(clean(dd.string)),
+                                 'link':dd.a['href']}
+
+    if 'Minifigs' in dt_strings:
+        dd = dds[dt_strings.index('Minifigs')]
+        set_details['Minifigs'] = {'count':int(clean(dd.string)),
+                                 'link':dd.a['href']}
+
+    if 'RRP' in dt_strings:
+        strings = dd_strings[dt_strings.index('RRP')].split('/')
+        rrps = [clean(rrp) for rrp in strings]
+        prieces = {}
+        for rrp in rrps:
+            if rrp[0] == u'£':
+                prieces['gbp'] = float_cur(rrp)
+            if rrp[0] == u'$':
+                prieces['usd'] = float_cur(rrp)
+            if rrp[0] == u'€':
+                prieces['eur'] = float_cur(rrp)
+        set_details['RRP'] = prieces
+
+    if 'Age range' in dt_strings:
+        age_str = dd_strings[dt_strings.index('Age range')]
+        if u'-' in age_str:
+            ages = age_str.split('-')
+            set_details['Age range'] = {
+                'start':int(clean(ages[0])),
+                'end':int(clean(ages[1]))
+            }
+        else:
+            if u'+' in age_str:
+                set_details['Age range'] = {
+                    'start':int(age_str[:-1]),
+                    'end':99
+                }
+            else:
+                set_details['Age range'] = {
+                    'start':None,
+                    'end':None
+                }
+
+
+
+    print set_details
+    """
+    print set_details
+
+    {u'Set number': u'70155-1',
+    u'Price per piece': u'13.500p / 17.554c / 20.257c',
+    u'Name': u'Inferno Pit', u'Weight': u'0.15Kg (0.33 lb)',
+    u'Year released': u'2014', u'Minifigs': u'1',
+    u'Subtheme': u'Speedorz', u'Tags': None,
+    u'Packaging': u'Box with backing card', u'Pieces': u'74',
+    u'Set type': u'Normal', u'Theme': u'Legends of Chima',
+    u'Age range': u'7 - 14', u'Dimensions': None, u'Theme group':
+    u'Action/Adventure', u'Rating': None, u'Barcodes': None,
+    u'Availability': u'Retail',
+    u'RRP': u'\xa39.99 / $12.99 / \u20ac14.99'}
+    None:Tags, Dimensions, Rating, Barcodes
+    """
+    data_names = (
+        'number', 'name', 'type', 'theme_group', 'theme', 'sub_theme',
+        'year', 'tags', 'pieces', 'pieces_link', 'minifigs',
+        'minifigs_link' , 'rrp_gbp', 'rrp_usd', 'rrp_eur',
+        'age_start', 'age_end', 'packaging',
+        'dimensions_cm_l','dimensions_cm_w','dimensions_cm_h',
+        'dimensions_in_l','dimensions_in_w','dimensions_in_h',
+        'weight_kg', 'weight_lb', 'upc', 'ean', 'availability',
+        'ava_at_lego'
+    )
+    datas = {}
+    datas['number'] = set_details['Set number']
+    datas['name'] = set_details['Name']
+    datas['type'] = set_details['Name']
+
+
+
 def test1():
     with open('ajax.txt') as f:
         parse_price(f.read())
@@ -103,16 +212,13 @@ def test1():
     print u'￥%.2f'%prices['US']['cp_rmb'],
     print u'%.2f%%'%(prices['US']['cp_disc']*100)
 
-def test2():
+def test_uk_url():
     base_url = 'http://brickset.com'
-    buy_uk_url = '/buy/vendor-amazon/country-uk/order-percentdiscount/page-1'
-    text = urlopen(base_url + buy_uk_url).read()
-    soup = BeautifulSoup(text)
-    divs = soup.find_all('div', class_='tags hideonmediumscreen')
-    for div in divs:
-        set_url = base_url + div.a['href']
+    buy_uk_url = '/buy/vendor-amazon/country-uk/order-percentdiscount/page-3'
+    text = urllib.urlopen(base_url + buy_uk_url).read()
+    parse_buy_UK(text)
 
-def test():
+def test1():
     with open('buy_uk.html') as f:
         parse_buy_UK(f.read())
 
@@ -138,5 +244,5 @@ def output(set_id):
         print u'%.2f%%'%(prices['US']['cp_disc']*100)
 
 if __name__ == '__main__':
-    test()
+    test_set_txt()
 
