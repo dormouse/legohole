@@ -4,8 +4,11 @@ import csv
 import sqlite3 as sqlite
 import glob
 from datetime import datetime
+
+DATABASE = 'test.db'
+
 def init_db():
-    cx = sqlite.connect("test.db")
+    cx = sqlite.connect(DATABASE)
     cx.execute("drop table if exists brickset")
     init_sql = """create table brickset (
             id integer primary key,
@@ -32,13 +35,10 @@ def init_db():
     cx.execute(init_sql)
     cx.close()
 
-def import_data():
-    cx = sqlite.connect("test.db")
-    #for file in glob.glob('*.csv'):
-    #    if file != 'brickset_20150319_date-added.csv':
-    #        pro_data(cx, file)
-    file = 'brickset_20150408_date-added.csv'
-    pro_data(cx, file)
+def import_brickset_csv():
+    cx = sqlite.connect(DATABASE)
+    csv_file = 'brickset.csv'
+    pro_data(cx, csv_file)
     cx.commit()
     cx.close()
 
@@ -47,7 +47,7 @@ def pro_data(cx, filename):
         reader = csv.DictReader(f)
         try:
             for row in reader:
-                if query_by_setid(row['SetID']):
+                if query_by_setid(cx, row['SetID']):
                     pass
                 else:
                     write_db(cx, row)
@@ -75,10 +75,10 @@ def write_db(cx, row):
         values (null,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,null,?)"
     cx.execute(sql, data_clean)
 
-def query_by_setid(setid):
+def query_by_setid(cx, setid):
     sql = 'select * from brickset where setid = ?'
     args = (setid,)
-    rvs = query_db(sql, args)
+    rvs = query_db(cx, sql, args)
     found_rows = len(rvs)
     if found_rows == 1:
         return True
@@ -88,14 +88,12 @@ def query_by_setid(setid):
         print 'error:mulity setid:%s'%(args[0])
         return False
 
-def query_db(query, args=(), one=False):
-    cx = sqlite.connect("test.db")
+def query_db(cx, query, args=(), one=False):
     cur = cx.execute(query, args)
     rv = [dict((cur.description[idx][0], value)
                for idx, value in enumerate(row)) for row in cur.fetchall()]
-    cx.close()
     return (rv[0] if rv else None) if one else rv
 
 if __name__ == '__main__':
-    import_data()
+    import_brickset_csv()
     #print glob.glob('*.csv')

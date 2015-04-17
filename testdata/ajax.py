@@ -254,7 +254,7 @@ def test1():
 
 def test_uk_url():
     base_url = 'http://brickset.com'
-    buy_uk_url = '/buy/vendor-amazon/country-uk/order-percentdiscount/page-3'
+    buy_uk_url = '/buy/vendor-amazon/country-uk/order-percentdiscount/page-1'
     text = urllib.urlopen(base_url + buy_uk_url).read()
     parse_buy_UK(text)
 
@@ -272,17 +272,18 @@ def parse_buy_UK(html):
 
 def output(set_id):
     prices = get_brickset_price_by_setid(set_id)
+    print set_id
     if prices.has_key('UK') and prices.has_key('US'):
         #format output
-        print set_id,
-        print u'£%s'%prices['UK']['cp'],
-        print u'￥%.2f'%prices['UK']['cp_rmb'],
-        print u'%.2f%%'%(prices['UK']['cp_disc']*100),
+        print u'£%s'%prices['UK']['cp'],'\t',
+        print u'￥%.2f'%prices['UK']['cp_rmb'],'\t',
+        print u'%.2f%%'%(prices['UK']['cp_disc']*100),'\t',
 
-        print u'$%s'%prices['US']['cp'],
-        print u'￥%.2f'%prices['US']['cp_rmb'],
-        print u'%.2f%%'%(prices['US']['cp_disc']*100)
+        print u'$%s'%prices['US']['cp'],'\t',
+        print u'￥%.2f'%prices['US']['cp_rmb'],'\t',
+        print u'%.2f%%'%(prices['US']['cp_disc']*100),'\t'
 
 if __name__ == '__main__':
-    test_set_txt()
+    #test_set_txt()
+    test_uk_url()
 
