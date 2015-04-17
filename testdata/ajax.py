@@ -105,9 +105,8 @@ def parse_set(html):
     dt_strings = [clean(dt.string) for dt in dts]
     dd_strings = [clean(dd.string) for dd in dds]
     set_details = dict(zip(dt_strings, dd_strings))
-    print dt_strings.index('Minifigs')
-    print 'price' in dt_strings
-    if 'Tags' in dt_strings:
+
+    if u'Tags' in dt_strings:
         dd = dds[dt_strings.index('Tags')]
         alist = dd.find_all('a')
         tags = []
@@ -116,17 +115,18 @@ def parse_set(html):
                          'name':clean(a.string)})
         set_details['Tags'] = tags
 
-    if 'Pieces' in dt_strings:
+    if u'Pieces' in dt_strings:
         dd = dds[dt_strings.index('Pieces')]
         set_details['Pieces'] = {'count':int(clean(dd.string)),
                                  'link':dd.a['href']}
 
-    if 'Minifigs' in dt_strings:
+    if u'Minifigs' in dt_strings:
         dd = dds[dt_strings.index('Minifigs')]
         set_details['Minifigs'] = {'count':int(clean(dd.string)),
                                  'link':dd.a['href']}
 
-    if 'RRP' in dt_strings:
+    if u'RRP' in dt_strings:
+        #零售价格
         strings = dd_strings[dt_strings.index('RRP')].split('/')
         rrps = [clean(rrp) for rrp in strings]
         prieces = {}
@@ -139,7 +139,8 @@ def parse_set(html):
                 prieces['eur'] = float_cur(rrp)
         set_details['RRP'] = prieces
 
-    if 'Age range' in dt_strings:
+    if u'Age range' in dt_strings:
+        #年龄范围
         age_str = dd_strings[dt_strings.index('Age range')]
         if u'-' in age_str:
             ages = age_str.split('-')
@@ -159,24 +160,63 @@ def parse_set(html):
                     'end':None
                 }
 
+    if u'Dimensions' in dt_strings:
+        #体积
+        dd = dds[dt_strings.index('Dimensions')]
+        #厘米
+        str_tmp = clean(dd.contents[0])[:-2]
+        cms = [float(clean(i)) for i in str_tmp.split('x')]
+        #英寸
+        str_tmp = clean(dd.contents[2])[1:-3]
+        ins = [float(clean(i)) for i in str_tmp.split('x')]
+        set_details['Dimensions'] = { 'cm':cms, 'in':ins }
+                    
+    if u'Weight' in dt_strings:
+        weight_str = dd_strings[dt_strings.index('Weight')]
+        str_tmp = weight_str.split('Kg')
+        kg = float(clean(str_tmp[0]))
+        lb = float(clean(str_tmp[1].split('lb')[0])[1:])
+        set_details['Weight'] = { 'kg':kg, 'lb':lb }
 
-
+    if u'Barcodes' in dt_strings:
+        dd = dds[dt_strings.index('Barcodes')]
+        upc = clean(dd.contents[0])[5:]
+        ean = clean(dd.contents[2])[5:]
+        set_details['Barcodes'] = { 'upc':upc, 'ean':ean } 
     print set_details
     """
     print set_details
 
     {u'Set number': u'70155-1',
     u'Price per piece': u'13.500p / 17.554c / 20.257c',
-    u'Name': u'Inferno Pit', u'Weight': u'0.15Kg (0.33 lb)',
-    u'Year released': u'2014', u'Minifigs': u'1',
-    u'Subtheme': u'Speedorz', u'Tags': None,
-    u'Packaging': u'Box with backing card', u'Pieces': u'74',
+    u'Name': u'Inferno Pit', u'Weight': {'lb': 0.33, 'kg': 0.15},
+    u'Year released': u'2014',
+    u'Minifigs': {
+        'count': 1,
+        'link': 'http://brickset.com/minifigs/inset-70155-1'
+    },
+    u'Subtheme': u'Speedorz',
+    u'Tags': [
+        {'link': 'http://brickset.com/sets/tag-Fluminox',
+        'name': u'Fluminox'},
+        {'link': 'http://brickset.com/sets/tag-Fire-And-Ice',
+        'name': u'Fire And Ice'},
+        {'link': 'http://brickset.com/sets/tag-Fire-Chi',
+        'name': u'Fire Chi'},
+        {'link': 'http://brickset.com/sets/tag-Phoenix-Tribe',
+        'name': u'Phoenix Tribe'}
+    ],
+    u'Packaging': u'Box with backing card',
+    u'Pieces': {'count': 74,
+        'link': 'http://brickset.com/inventories/70155-1'
+    },
     u'Set type': u'Normal', u'Theme': u'Legends of Chima',
-    u'Age range': u'7 - 14', u'Dimensions': None, u'Theme group':
-    u'Action/Adventure', u'Rating': None, u'Barcodes': None,
+    u'Age range': {'start': 7, 'end': 14},
+    u'Dimensions': {'cm': [28.2, 24.2, 5.4], 'in': [11.1, 9.5, 2.1]},
+    u'Theme group': u'Action/Adventure', u'Rating': None,
+    u'Barcodes': {'upc': u'673419211024', 'ean': u'5702015124744'},
     u'Availability': u'Retail',
-    u'RRP': u'\xa39.99 / $12.99 / \u20ac14.99'}
-    None:Tags, Dimensions, Rating, Barcodes
+    u'RRP': {'usd': 12.99, 'gbp': 9.99, 'eur': 14.99}}
     """
     data_names = (
         'number', 'name', 'type', 'theme_group', 'theme', 'sub_theme',
