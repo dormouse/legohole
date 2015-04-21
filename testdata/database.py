@@ -19,9 +19,20 @@ class LegoDb():
     def disconnect_db(self):
         self.cx.close()
         
-    def init_table(self, tablename):
+    def create_view(self, name):
         self.connect_db()
-        if tablename == 'brickset':
+        if name == 'brickset_number_view':
+            self.cx.execute("drop view if exists brickset_number_view")
+            sql = """
+                CREATE VIEW brickset_number_view AS 
+                SELECT id, number||'-'||variant as set_number FROM brickset
+            """
+            self.cx.execute(sql)
+        self.disconnect_db()
+
+    def create_table(self, name):
+        self.connect_db()
+        if name == 'brickset':
             self.cx.execute("drop table if exists brickset")
             init_sql = """create table brickset (
                     id integer primary key,
@@ -47,7 +58,7 @@ class LegoDb():
                     data_source text)"""
             self.cx.execute(init_sql)
 
-        if tablename == 'huilv':
+        if name == 'huilv':
             self.cx.execute("drop table if exists huilv")
             init_sql = """create table huilv (
                     id integer primary key,
@@ -67,9 +78,9 @@ class LegoDb():
                    for idx, value in enumerate(row)) for row in cur.fetchall()]
         return (rv[0] if rv else None) if one else rv
 
-    def query_brickset_setid(self, setid):
+    def query_brickset_by_setid(self, setid):
         """查询 brickset 表中 setid 是否存在"""
-        self.connect_db()
+
         sql = 'select * from brickset where setid = ?'
         args = (setid,)
         rvs = self.query_db(sql, args)
@@ -81,10 +92,49 @@ class LegoDb():
         if found_rows > 1:
             print 'error:mulity setid:%s'%(args[0])
             return False
-        self.disconnect_db()
+
+    def get_id_by_set_number(self, set_number):
+        """根据 set_number 查询 id """
+
+        sql = """
+            select id from brickset_number_view
+            where set_number = ?
+        """
+        args = (set_number,)
+        row = self.query_db(sql, args, True)
+        return row['id'] if row else None
+
+    def query_brickset_by_id(self, set_id):
+        """根据 id 查询 brickset 表 """
+
+        sql = 'select * from brickset where id = ?'
+        args = (set_id,)
+        row = self.query_db(sql, args, True)
+        return row
+
+    def query_brickset_by_set_number(self, set_number):
+        """根据 set_number 查询 brickset 表 """
+        set_id = self.get_id_by_set_number(set_number)
+        if set_id:
+            row = self.query_brickset_by_id(set_id)
+        return row
+
+    def query_huilv(self):
+        now = datetime.now()
+        cur_date = now.strftime("%Y%m%d")
+        sql = 'select * from huilv where date = ?'
+        args = (cur_date,)
+        row = self.query_db(sql, args, True)
+        return row
 
 
 
 if __name__ == '__main__':
-    print LegoDb().query_brickset_setid('8088')
+    db = LegoDb()
+    db.connect_db()
+    #print LegoDb().query_brickset_setid('8088')
+    #LegoDb().create_view('brickset_number_view')
+    #print db.query_brickset_by_set_number('60052-1')
+    print db.query_huilv()
+    db.disconnect_db()
 

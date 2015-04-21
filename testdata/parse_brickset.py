@@ -28,10 +28,10 @@ def request_ajax_data(url,data,referer=None,**headers):
     return jsonText
     #return json.loads(jsonText)
 
-def get_brickset_price_by_setid(set_id):
+def get_brickset_price_by_set_number(set_number):
     base_url = 'http://brickset.com'
     price_ajax_url = base_url+'/ajax/sets/buy'
-    ajax_request_body = {"set":set_id}
+    ajax_request_body = {"set":set_number}
     ajax_response = request_ajax_data(price_ajax_url, ajax_request_body)
     return parse_price(ajax_response)
 
@@ -71,20 +71,7 @@ def parse_price(html):
     currency_symbols = (u'£', u'$', u'€', u'€', u'€', u'€', u'$')
     #列表内容
     contents = ('cp', 'rp', 'mp', 'asin')
-    #计算折扣
-    gbp_rate = 9.2042
-    usd_rate = 6.2209
-    if prices.has_key('UK') and prices.has_key('US'):
-        #英镑退税后人民币当前价格
-        prices['UK']['cp_rmb'] = prices['UK']['cp'] * gbp_rate / 1.2
-        #美元人民币当前价格
-        prices['US']['cp_rmb'] = prices['US']['cp'] * usd_rate
-        #美元人民币零售价格
-        prices['US']['rp_rmb'] = prices['US']['rp'] * usd_rate
-        #英镑退税后人民币当前价格折扣
-        prices['UK']['cp_disc'] = prices['UK']['cp_rmb']/prices['US']['rp_rmb']
-        #美元人民币当前价格折扣
-        prices['US']['cp_disc'] = prices['US']['cp_rmb']/prices['US']['rp_rmb']
+
 
     return prices
 
@@ -242,7 +229,7 @@ def test_price_txt():
         prices = parse_price(f.read())
 
     set_id = '70161-1'
-    #prices = get_brickset_price_by_setid(set_id)
+    #prices = get_brickset_price_by_set_number(set_id)
 
     #format output
     print set_id,
@@ -261,7 +248,7 @@ def test_uk_url():
     text = urllib.urlopen(base_url + buy_uk_url).read()
     parse_buy_UK(text)
 
-def test1():
+def test_uk_text():
     with open('buy_uk.html') as f:
         parse_buy_UK(f.read())
 
@@ -273,7 +260,7 @@ def parse_buy_UK(html):
         output(set_id)
 
 def output(set_id):
-    prices = get_brickset_price_by_setid(set_id)
+    prices = get_brickset_price_by_set_number(set_id)
     print set_id
     if prices.has_key('UK') and prices.has_key('US'):
         #format output

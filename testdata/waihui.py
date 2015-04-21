@@ -7,6 +7,8 @@ import urllib
 from bs4 import BeautifulSoup
 import sqlite3 as sqlite
 
+from database import LegoDb
+
 DATABASE = 'test.db'
 
 def init_db():
@@ -78,23 +80,18 @@ def debug_print(huilv):
     for i in huilv:
         print i, huilv[i]
 
+def get_huilv_from_db():
+    db = LegoDb()
+    db.connect_db()
+    huilv = db.query_huilv()
+    db.disconnect_db()
+    return huilv
+
 def get_huilv():
-    cx = sqlite.connect(DATABASE)
-
-    cx.execute("drop table if exists huilv")
-    init_sql = """create table huilv (
-            id integer primary key,
-            usd text,
-            gbp text,
-            eur text,
-            cad text,
-            date text,
-            time text
-            )"""
-    cx.execute(init_sql)
-    cx.close()
-
-    huilv = get_huilv_from_cmb()
+    huilv = get_huilv_from_db()
+    if not huilv:
+        huilv = get_huilv_from_cmb()
+    return huilv
 
 if __name__ == '__main__':
     #init_db()
