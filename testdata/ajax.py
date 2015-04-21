@@ -6,6 +6,8 @@ import urllib2
 import urllib
 from bs4 import BeautifulSoup
 
+from waihui import get_huilv
+
 def request_ajax_data(url,data,referer=None,**headers):
     req = urllib2.Request(url)
     req.add_header('Content-Type',
@@ -235,12 +237,13 @@ def parse_set(html):
 
 
 
-def test1():
+def test_price_txt():
     with open('ajax.txt') as f:
-        parse_price(f.read())
+        prices = parse_price(f.read())
 
     set_id = '70161-1'
-    prices = get_brickset_price_by_setid(set_id)
+    #prices = get_brickset_price_by_setid(set_id)
+
     #format output
     print set_id,
     print u'£%s'%prices['UK']['cp'],
@@ -263,7 +266,6 @@ def test1():
         parse_buy_UK(f.read())
 
 def parse_buy_UK(html):
-    base_url = 'http://brickset.com'
     soup = BeautifulSoup(html)
     divs = soup.find_all('div', class_='tags hideonmediumscreen')
     set_ids = [div.a.string for div in divs]
@@ -285,5 +287,6 @@ def output(set_id):
 
 if __name__ == '__main__':
     #test_set_txt()
-    test_uk_url()
+    #test_uk_url()
+    test_price_txt()
 
