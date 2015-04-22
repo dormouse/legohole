@@ -120,7 +120,7 @@ def uk_disc(price):
     usd_rate = float(huilv['usd'])/100
 
     #计算折扣
-    uk_cp = price['price']
+    uk_cp = float(price['price'])
     us_rp_rmb = float(us_rp) * usd_rate 
     #英镑退税后人民币当前价格
     uk_cp_rmb = uk_cp * gbp_rate / 1.2
@@ -131,7 +131,7 @@ def uk_disc(price):
     objs['price_rmb'] = u'￥%.2f'%uk_cp_rmb
     objs['disc'] = u'%.2f%%'%uk_disc
 
-    data = [objs[field] for field in fields]
+    data = [objs.get(field) for field in fields]
     print data
     return data
 
