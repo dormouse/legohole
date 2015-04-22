@@ -13,6 +13,9 @@ import os
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash
 
+import parse_brickset
+from database import LegoDb
+
 DATABASE = '/home/dormouse/project/legohole/testdata/test.db'
 TABLE = 'brickset'
 
@@ -65,6 +68,73 @@ def index():
     sql = 'select * from brickset order by add_time desc limit 10'
     objs = get_sets_table(sql)
     return render_template('index.html', objs=objs)
+
+@app.route('/buy_uk')
+def buy_uk():
+    objs = {}
+
+    objs['table_head'] = [
+            'pic', 'set_number', 'name', 'theme', 'year',
+            'price', 'price_rmb', 'discount', 'vendor'
+            ]
+    #get last update time
+    sql = "select * from update_log where content = 'buy_uk' order by end desc"
+    row = query_db(sql, args=(), one=True)
+    if row:
+        sql = "select * from price where datetime >= ? and datetime <= ?"
+        args = (row['start'], row['end'])
+        prices = query_db(sql, args)
+        objs['table_body'] = []
+        for p in prices:
+            objs['table_body'].append(uk_disc(p))
+
+    return render_template('set_buy_uk.html', objs=objs)
+
+def uk_disc(price):
+    """ caculate uk price discount"""
+    fields = [
+            'thumb_url', 'set_number', 'name', 'theme', 'year',
+            'price', 'price_rmb', 'disc', 'vendor'
+            ]
+
+    objs = {}
+    objs['set_number'] = price['set_number']
+    objs['vendor'] = price['vendor']
+
+    #small_pic_url,name,number,theme,year,
+    #price_uk,price_uk_rmb,discount
+    objs['thumb_url'] = ''.join(
+        ("http://images.brickset.com/sets",
+         "/thumbs/tn_%s_jpg.jpg"%objs['set_number']))
+    db = LegoDb(g.db)
+    row = db.query_brickset_by_set_number(objs['set_number'])
+    if row:
+        objs['name'] = row.get('name')
+        objs['theme'] = row.get('theme')
+        objs['year'] = row.get('year')
+        us_rp = row.get('usprice')
+
+    #得到汇率
+    huilv = db.query_huilv()
+    gbp_rate = float(huilv['gbp'])/100
+    usd_rate = float(huilv['usd'])/100
+
+    #计算折扣
+    uk_cp = price['price']
+    us_rp_rmb = float(us_rp) * usd_rate 
+    #英镑退税后人民币当前价格
+    uk_cp_rmb = uk_cp * gbp_rate / 1.2
+    #英镑退税后人民币当前价格折扣
+    uk_disc = uk_cp_rmb/us_rp_rmb * 100
+
+    objs['price'] = u'£%s'%uk_cp
+    objs['price_rmb'] = u'￥%.2f'%uk_cp_rmb
+    objs['disc'] = u'%.2f%%'%uk_disc
+
+    data = [objs[field] for field in fields]
+    print data
+    return data
+
 
 @app.route('/set/number/<set_number>')
 def sets_by_number(set_number):

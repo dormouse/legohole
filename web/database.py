@@ -10,8 +10,11 @@ DATABASE = 'test.db'
 class LegoDb():
     """LEGO 数据库"""
 
-    def __init__(self):
-        self.db_name = 'test.db'
+    def __init__(self,cx=None):
+        if cx:
+            self.cx = cx
+        else:
+            self.db_name = 'test.db'
 
     def connect_db(self):
         self.cx = sqlite.connect(DATABASE)
@@ -143,7 +146,7 @@ class LegoDb():
     def query_huilv(self):
         now = datetime.now()
         cur_date = now.strftime("%Y%m%d")
-        sql = 'select * from huilv where date = ?'
+        sql = 'select * from huilv where datetime > ?'
         args = (cur_date,)
         row = self.query_db(sql, args, True)
         return row

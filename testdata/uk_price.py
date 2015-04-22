@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*
 from bs4 import BeautifulSoup
 from urllib import urlopen
+from datetime import datetime
 
 import parse_brickset
 from waihui import get_huilv
@@ -17,6 +18,12 @@ divs = soup.find_all('div', class_='tags hideonmediumscreen')
 for div in divs:
     set_url = base_url + div.a['href']
 """
+def test_uk_url():
+    base_url = 'http://brickset.com'
+    buy_uk_url = '/buy/vendor-amazon/country-uk/order-percentdiscount/page-1'
+    text = urlopen(base_url + buy_uk_url).read()
+    parse_buy_UK(text)
+
 def test_uk_text():
     """测试本地文档"""
     with open('buy_uk.html') as f:
@@ -26,76 +33,43 @@ def parse_buy_UK(html):
     """分析英国折扣页面"""
 
     soup = BeautifulSoup(html)
-    divs = soup.find_all('div', class_='tags hideonmediumscreen')
-    set_numbers = [div.a.string for div in divs]
-    for number in set_numbers[:4]:
-        output(number)
+    table = soup.find_all('table', class_='neattable')[0]
+    trs = table.tbody.find_all('tr')
+    prices = [parse_buy_uk_tr(tr) for tr in trs]
+    write_db(prices)
 
-def output(set_number):
-    """输出结果"""
+def parse_buy_uk_tr(tr):
+
     obj = {}
+    tds = tr.find_all('td')
+    obj['set_number'] = tds[1].div.a.text
 
+    if tds[2].text == u'(Marketplace)':
+        obj['vendor'] = u'amazon_uk_MP'
+    else:
+        obj['vendor'] = u'amazon_uk'
+
+    price_span = tr.find_all('span', class_='price')[0]
+    price = price_span.text
+    obj['price'] = price[1:] 
+
+    obj['datetime'] = datetime.now().strftime("%Y%m%d%H%M%S")
+
+    return obj
+
+def write_db(prices):
+    """把价格写入数据库"""
+    obj = {}
     db = LegoDb()
     db.connect_db()
-
-    #small_pic_url,name,number,theme,year,
-    #price_uk,price_uk_rmb,discount
-    obj['thumb_url'] = ''.join(("http://images.brickset.com",
-                               "/sets/thumbs/tn_%s_jpg.jpg"%set_number))
-    row = db.query_brickset_by_set_number(set_number)
-    if row:
-        obj['name'] = row.get('name')
-        obj['theme'] = row.get('theme')
-        obj['year'] = row.get('year')
-
-    #得到汇率
-    huilv = get_huilv()
-    gbp_rate = float(huilv['gbp'])
-    usd_rate = float(huilv['usd'])
-
-    #计算折扣
-    prices = parse_brickset.get_brickset_price_by_set_number(set_number)
-    #英镑退税后人民币当前价格
-    uk_cp_rmb = prices['UK']['cp'] * gbp_rate / 1.2
-
-    if prices.has_key('US'):
-        #美元人民币当前价格
-        us_cp_rmb = prices['US']['cp'] * usd_rate
-        #美元人民币零售价格
-        us_rp_rmb = prices['US']['rp'] * usd_rate
-        #美元人民币当前价格折扣
-        us_disc = us_cp_rmb/us_rp_rmb * 100
-        obj['price_us'] = u'£%s'%prices['US']['cp']
-        obj['price_us_rmb'] = u'￥%.2f'%us_cp_rmb
-        obj['disc_us'] = u'%.2f%%'%us_disc
-    else:
-        us_rp_rmb = float(row['usprice']) * usd_rate 
-
-    #英镑退税后人民币当前价格折扣
-    uk_disc = uk_cp_rmb/us_rp_rmb * 100
-
-    obj['price_uk'] = u'£%s'%prices['UK']['cp']
-    obj['price_uk_rmb'] = u'￥%.2f'%uk_cp_rmb
-    obj['disc_uk'] = u'%.2f%%'%uk_disc
-
-
-    print obj
-
-    """
-    prices = get_brickset_price_by_setid(set_id)
-    print set_id
-    if prices.has_key('UK') and prices.has_key('US'):
-        #format output
-        print u'£%s'%prices['UK']['cp'],'\t',
-        print u'￥%.2f'%prices['UK']['cp_rmb'],'\t',
-        print u'%.2f%%'%(prices['UK']['cp_disc']*100),'\t',
-
-        print u'$%s'%prices['US']['cp'],'\t',
-        print u'￥%.2f'%prices['US']['cp_rmb'],'\t',
-        print u'%.2f%%'%(prices['US']['cp_disc']*100),'\t'
-    """
-
+    obj['start'] = datetime.now().strftime("%Y%m%d%H%M%S")
+    db.append_prices(prices)
+    obj['end'] = datetime.now().strftime("%Y%m%d%H%M%S")
+    obj['content'] = 'buy_uk'
+    db.append_update_log(obj)
     db.disconnect_db()
+
+
     
 if __name__ == "__main__":
-    test_uk_text()
+    test_uk_url()
