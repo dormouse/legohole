@@ -12,6 +12,7 @@ from database import LegoDb
 
 def get_huilv_from_cmb():
     """ get huilv from china merchants bank"""
+
     cmb_url = 'http://fx.cmbchina.com/Hq/'
     html_waihui = urllib.urlopen(cmb_url).read()
     huilv = parse_huilv_html(html_waihui)
@@ -51,9 +52,15 @@ def get_buy_uk():
     """get disc of amazon uk from briceset"""
 
     base_url = 'http://brickset.com'
-    buy_uk_url = '/buy/vendor-amazon/country-uk/order-percentdiscount/page-1'
-    html = urllib.urlopen(base_url + buy_uk_url).read()
-    return parse_buy_uk(html)
+    buy_uk_url = '/buy/vendor-amazon/country-uk/order-percentdiscount/page-'
+    prices = []
+    for i in range(1,4):
+        html = urllib.urlopen(base_url + buy_uk_url + '%s'%i).read()
+        prices +=parse_buy_uk(html)
+
+        print base_url + buy_uk_url + '%s'%i
+    print len(prices)
+    return prices
 
 def parse_buy_uk(html):
     """分析英国折扣页面"""
@@ -65,6 +72,7 @@ def parse_buy_uk(html):
     return prices
 
 def parse_buy_uk_tr(tr):
+    """分析英国折扣页面每一行的数据"""
 
     obj = {}
     tds = tr.find_all('td')
@@ -87,8 +95,8 @@ def update_buy_uk():
     obj = {}
     db = LegoDb()
     db.connect_db()
-    prices = get_buy_uk()
     obj['start'] = datetime.now().strftime("%Y%m%d%H%M%S")
+    prices = get_buy_uk()
     db.append_prices(prices)
     obj['end'] = datetime.now().strftime("%Y%m%d%H%M%S")
     obj['content'] = 'buy_uk'
@@ -99,10 +107,10 @@ def update_huilv():
     """ update huilv """
 
     obj = {}
-    huilv = get_huilv_from_cmb()
     db = LegoDb()
     db.connect_db()
     obj['start'] = datetime.now().strftime("%Y%m%d%H%M%S")
+    huilv = get_huilv_from_cmb()
     db.append_huilv(huilv)
     obj['end'] = datetime.now().strftime("%Y%m%d%H%M%S")
     obj['content'] = 'huilv'

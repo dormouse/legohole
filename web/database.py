@@ -136,8 +136,21 @@ class LegoDb():
         row = self.query_db(sql, one = True)
         return row
 
+    def append_db(self, table, fields, datas):
+        sql = '' .join([
+            "insert into %s"%table,
+            "(id,%s)"%','.join(fields),
+            "values (null,%s)"%','.join('?'*len(fields))
+        ])
+        for data in datas:
+            args = ([data[field] for field in fields])
+            self.cx.execute(sql, args)
+        self.cx.commit()
+
+
     def append_prices(self,prices):
         """write price to db"""
+        """
         fields = ('set_number', 'price', 'vendor', 'datetime')
         for price in prices:
             data = ([price[field] for field in fields])
@@ -145,6 +158,10 @@ class LegoDb():
                 values (null,?,?,?,?)"
             self.cx.execute(sql, data)
         self.cx.commit()
+        """
+        fields = ('set_number', 'price', 'vendor', 'datetime')
+        self.append_db('price', fields, prices)
+
 
     def append_huilv(self, huilv):
         """ append current huilv to db"""

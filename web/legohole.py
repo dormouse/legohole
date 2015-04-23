@@ -80,7 +80,7 @@ def buy_uk():
 
     table_head_zh = [
             'pic', 'set_number', 'name', 'theme', 'year',
-            'price', 'price_rmb', 'discount', 'vendor'
+            u'英镑', u'人民币', 'discount', 'vendor'
             ]
 
     objs['table_head'] = zip(table_head_field,
@@ -105,10 +105,8 @@ def ajax_buy_uk():
 
 def uk_disc(price):
     """ caculate uk price discount"""
-    fields = [
-            'thumb_url', 'set_number', 'name', 'theme', 'year',
-            'price', 'price_rmb', 'disc', 'vendor'
-            ]
+    fields = ['thumb_url', 'set_number', 'name', 'theme', 'year',
+              'price', 'price_rmb', 'disc', 'vendor']
 
     objs = {}
     objs['set_number'] = price['set_number']
@@ -135,15 +133,18 @@ def uk_disc(price):
 
     #计算折扣
     uk_cp = float(price['price'])
-    us_rp_rmb = float(us_rp) * usd_rate 
+    objs['price'] = uk_cp
     #英镑退税后人民币当前价格
     uk_cp_rmb = uk_cp * gbp_rate / 1.2
-    #英镑退税后人民币当前价格折扣
-    uk_disc = round(uk_cp_rmb/us_rp_rmb*100, 2) 
-
-    objs['price'] = u'£%s'%uk_cp
-    objs['price_rmb'] = u'￥%.2f'%uk_cp_rmb
-    objs['discount'] = uk_disc
+    objs['price_rmb'] = round(uk_cp_rmb, 2)
+    try:
+        us_rp_rmb = float(us_rp) * usd_rate 
+        us_rp_rmb = float(us_rp) * usd_rate 
+        #英镑退税后人民币当前价格折扣
+        uk_disc = round(uk_cp_rmb/us_rp_rmb*100, 2) 
+        objs['discount'] = uk_disc
+    except:
+        pass
 
     return objs
 
