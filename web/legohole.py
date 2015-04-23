@@ -12,6 +12,7 @@ import sqlite3
 import os
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash
+import json
 
 import parse_brickset
 from database import LegoDb
@@ -56,7 +57,7 @@ def get_sets_table(sql):
         row['price'] = row['price'] if row['price'] else u'无'
         row['subtheme'] = row['subtheme'] if row['subtheme'] else u'无'
         row['minifigs'] = row['minifigs'] if row['minifigs'] else u'无'
-        show_items = [ row['id'], row['number']+'-'+row['variant'],
+        show_items = [ row['id'], row['number'],
                 row['name'], row['theme'], row['subtheme'],
                 row['price'], row['year'], row['minifigs']]
         objs['table_body'].append(show_items)
@@ -72,11 +73,23 @@ def index():
 @app.route('/buy_uk')
 def buy_uk():
     objs = {}
-
-    objs['table_head'] = [
+    table_head_field = [
             'pic', 'set_number', 'name', 'theme', 'year',
             'price', 'price_rmb', 'discount', 'vendor'
             ]
+
+    table_head_zh = [
+            'pic', 'set_number', 'name', 'theme', 'year',
+            'price', 'price_rmb', 'discount', 'vendor'
+            ]
+
+    objs['table_head'] = zip(table_head_field,
+                                  table_head_zh)
+    return render_template('set_buy_uk.html', objs=objs)
+
+@app.route('/ajax/buy_uk')
+def ajax_buy_uk():
+    objs = {}
     #get last update time
     sql = "select * from update_log where content = 'buy_uk' order by end desc"
     row = query_db(sql, args=(), one=True)
@@ -87,8 +100,8 @@ def buy_uk():
         objs['table_body'] = []
         for p in prices:
             objs['table_body'].append(uk_disc(p))
+    return json.dumps(objs['table_body'])
 
-    return render_template('set_buy_uk.html', objs=objs)
 
 def uk_disc(price):
     """ caculate uk price discount"""
@@ -103,15 +116,16 @@ def uk_disc(price):
 
     #small_pic_url,name,number,theme,year,
     #price_uk,price_uk_rmb,discount
-    objs['thumb_url'] = ''.join(
-        ("http://images.brickset.com/sets",
-         "/thumbs/tn_%s_jpg.jpg"%objs['set_number']))
+    objs['pic'] = ''.join(
+        ('<img src ="http://images.brickset.com/sets',
+         '/thumbs/tn_%s_jpg.jpg">'%objs['set_number']))
     db = LegoDb(g.db)
-    row = db.query_brickset_by_set_number(objs['set_number'])
+    row = db.query_brickset(True, number=objs['set_number'])
     if row:
         objs['name'] = row.get('name')
         objs['theme'] = row.get('theme')
         objs['year'] = row.get('year')
+
         us_rp = row.get('usprice')
 
     #得到汇率
@@ -125,15 +139,13 @@ def uk_disc(price):
     #英镑退税后人民币当前价格
     uk_cp_rmb = uk_cp * gbp_rate / 1.2
     #英镑退税后人民币当前价格折扣
-    uk_disc = uk_cp_rmb/us_rp_rmb * 100
+    uk_disc = round(uk_cp_rmb/us_rp_rmb*100, 2) 
 
     objs['price'] = u'£%s'%uk_cp
     objs['price_rmb'] = u'￥%.2f'%uk_cp_rmb
-    objs['disc'] = u'%.2f%%'%uk_disc
+    objs['discount'] = uk_disc
 
-    data = [objs.get(field) for field in fields]
-    print data
-    return data
+    return objs
 
 
 @app.route('/set/number/<set_number>')
@@ -199,7 +211,7 @@ def sets_by_id(set_id):
     row['minifigs'] = row['minifigs'] if row['minifigs'] else u'无'
 
     show_items = [
-            {'name':u'编号', 'value':row['number']+'-'+row['variant']},
+            {'name':u'编号', 'value':row['number']},
             {'name':u'名称', 'value':row['name']},
             {'name':u'系列', 'value':row['theme']},
             {'name':u'子系列', 'value':row['subtheme']},

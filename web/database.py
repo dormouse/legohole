@@ -5,7 +5,7 @@ import sqlite3 as sqlite
 import glob
 from datetime import datetime
 
-DATABASE = 'test.db'
+DATABASE = '/home/dormouse/project/legohole/testdata/test.db'
 
 class LegoDb():
     """LEGO 数据库"""
@@ -22,17 +22,6 @@ class LegoDb():
     def disconnect_db(self):
         self.cx.close()
         
-    def create_view(self, name):
-        self.connect_db()
-        if name == 'brickset_number_view':
-            self.cx.execute("drop view if exists brickset_number_view")
-            sql = """
-                CREATE VIEW brickset_number_view AS 
-                SELECT id, number||'-'||variant as set_number FROM brickset
-            """
-            self.cx.execute(sql)
-        self.disconnect_db()
-
     def create_table(self, name):
         self.connect_db()
         if name == 'brickset':
@@ -102,11 +91,11 @@ class LegoDb():
                    for idx, value in enumerate(row)) for row in cur.fetchall()]
         return (rv[0] if rv else None) if one else rv
 
-    def query_brickset_by_setid(self, setid):
+    def query_brickset_by_brickset_id(self, brickset_id):
         """查询 brickset 表中 setid 是否存在"""
 
-        sql = 'select * from brickset where setid = ?'
-        args = (setid,)
+        sql = 'select * from brickset where brickset_id = ?'
+        args = (brickset_id,)
         rvs = self.query_db(sql, args)
         found_rows = len(rvs)
         if found_rows == 1:
@@ -117,38 +106,34 @@ class LegoDb():
             print 'error:mulity setid:%s'%(args[0])
             return False
 
-    def get_id_by_set_number(self, set_number):
-        """根据 set_number 查询 id """
-
-        sql = """
-            select id from brickset_number_view
-            where set_number = ?
+    def query_brickset(self, one=False, *fields, **filters):
         """
-        args = (set_number,)
-        row = self.query_db(sql, args, True)
-        return row['id'] if row else None
+        功能：
+            查询 brickset 表
+        参数：
+            one    ：是否只返回一条记录
+            fields ：返回的字段名称
+            filters：查询条件
+        """
+        fieldstr = ','.join(fields) if fields else '*'
+        if filters:
+            flist = [(k,v) for k,v in filters.items()]
+            wlist = ["%s = ?"%k for k,v in flist]
+            wherestr = 'where ' + ' and '.join(wlist)
+            args = [v for k,v in flist]
+        else:
+            wherestr = ''
+            args = ()
 
-    def query_brickset_by_id(self, set_id):
-        """根据 id 查询 brickset 表 """
+        sql = ' '.join(['select', fieldstr, 'from brickset', wherestr])
 
-        sql = 'select * from brickset where id = ?'
-        args = (set_id,)
-        row = self.query_db(sql, args, True)
-        return row
-
-    def query_brickset_by_set_number(self, set_number):
-        """根据 set_number 查询 brickset 表 """
-        set_id = self.get_id_by_set_number(set_number)
-        if set_id:
-            row = self.query_brickset_by_id(set_id)
-        return row
+        #print sql
+        #print args
+        return self.query_db(sql, args, one)
 
     def query_huilv(self):
-        now = datetime.now()
-        cur_date = now.strftime("%Y%m%d")
-        sql = 'select * from huilv where datetime > ?'
-        args = (cur_date,)
-        row = self.query_db(sql, args, True)
+        sql = 'select * from huilv order by datetime desc'
+        row = self.query_db(sql, one = True)
         return row
 
     def append_prices(self,prices):
@@ -159,6 +144,16 @@ class LegoDb():
             sql = u"insert into price (id,set_number,price,vendor,datetime) \
                 values (null,?,?,?,?)"
             self.cx.execute(sql, data)
+        self.cx.commit()
+
+    def append_huilv(self, huilv):
+        """ append current huilv to db"""
+
+        fields = ('usd', 'gbp', 'eur', 'cad', 'datetime')
+        data = ([huilv[field] for field in fields])
+        sql = u"insert into huilv (id,usd,gbp,eur,cad,datetime) \
+            values (null,?,?,?,?,?)"
+        self.cx.execute(sql, data)
         self.cx.commit()
 
     def append_update_log(self,log):
@@ -177,6 +172,9 @@ if __name__ == '__main__':
     #LegoDb().create_view('brickset_number_view')
     #print db.query_brickset_by_set_number('60052-1')
     #print db.query_huilv()
-    db.create_table('price')
+    #db.create_table('price')
+    db.query_brickset(True, 'number', id='333', number=444)
+    db.query_brickset(True, id='333', number=444)
+    db.query_brickset(True)
     db.disconnect_db()
 

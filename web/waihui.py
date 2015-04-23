@@ -6,33 +6,18 @@ import urllib2
 import urllib
 from bs4 import BeautifulSoup
 import sqlite3 as sqlite
+from datetime import datetime
 
 from database import LegoDb
 
-DATABASE = 'test.db'
-
-def write_db(huilv):
-    cx = sqlite.connect(DATABASE)
-    fields = ('usd', 'gbp', 'eur', 'cad', 'datetime')
-    data = ([huilv[field] for field in fields])
-    sql = u"insert into huilv (id,usd,gbp,eur,cad,datetime) \
-        values (null,?,?,?,?,?)"
-    cx.execute(sql, data)
-    cx.commit()
-    cx.close()
-
 def get_huilv_from_cmb():
+    """ get huilv from china merchants bank"""
     cmb_url = 'http://fx.cmbchina.com/Hq/'
     html_waihui = urllib.urlopen(cmb_url).read()
-    huilv = parse_html(html_waihui)
+    huilv = parse_huilv_html(html_waihui)
     return huilv
 
-def get_huilv_from_cmb_test():
-    with open('test_waihui.html') as f:
-        huilv = parse_html(f.read())
-    return huilv
-
-def parse_html(html):
+def parse_huilv_html(html):
     bs = BeautifulSoup(html)
     huilv  = {}
     names = (
@@ -62,32 +47,72 @@ def parse_html(html):
     #TODO:验证数据
     return huilv
 
-def debug_print(huilv):
-    for i in huilv:
-        print i, huilv[i]
+def get_buy_uk():
+    """get disc of amazon uk from briceset"""
 
-def get_huilv_from_db():
+    base_url = 'http://brickset.com'
+    buy_uk_url = '/buy/vendor-amazon/country-uk/order-percentdiscount/page-1'
+    html = urllib.urlopen(base_url + buy_uk_url).read()
+    return parse_buy_uk(html)
+
+def parse_buy_uk(html):
+    """分析英国折扣页面"""
+
+    soup = BeautifulSoup(html)
+    table = soup.find_all('table', class_='neattable')[0]
+    trs = table.tbody.find_all('tr')
+    prices = [parse_buy_uk_tr(tr) for tr in trs]
+    return prices
+
+def parse_buy_uk_tr(tr):
+
+    obj = {}
+    tds = tr.find_all('td')
+    obj['set_number'] = tds[1].div.a.text
+
+    if tds[2].text == u'(Marketplace)':
+        obj['vendor'] = u'amazon_uk_MP'
+    else:
+        obj['vendor'] = u'amazon_uk'
+
+    price_span = tr.find_all('span', class_='price')[0]
+    price = price_span.text
+    obj['price'] = price[1:] 
+    obj['datetime'] = datetime.now().strftime("%Y%m%d%H%M%S")
+
+    return obj
+
+def update_buy_uk():
+    """把价格写入数据库"""
+    obj = {}
     db = LegoDb()
     db.connect_db()
-    huilv = db.query_huilv()
+    prices = get_buy_uk()
+    obj['start'] = datetime.now().strftime("%Y%m%d%H%M%S")
+    db.append_prices(prices)
+    obj['end'] = datetime.now().strftime("%Y%m%d%H%M%S")
+    obj['content'] = 'buy_uk'
+    db.append_update_log(obj)
     db.disconnect_db()
-    return huilv
 
-def get_huilv():
-    huilv = get_huilv_from_db()
-    if not huilv:
-        huilv = get_huilv_from_cmb()
-    return huilv
+def update_huilv():
+    """ update huilv """
+
+    obj = {}
+    huilv = get_huilv_from_cmb()
+    db = LegoDb()
+    db.connect_db()
+    obj['start'] = datetime.now().strftime("%Y%m%d%H%M%S")
+    db.append_huilv(huilv)
+    obj['end'] = datetime.now().strftime("%Y%m%d%H%M%S")
+    obj['content'] = 'huilv'
+    db.append_update_log(obj)
+    db.disconnect_db()
+
+def update_db():
+    #update_huilv()
+    update_buy_uk()
 
 if __name__ == '__main__':
-    #init_db()
-    #huilv = get_huilv_from_cmb_test()
-    huilv = get_huilv_from_cmb()
-    debug_print(huilv)
-    write_db(huilv)
-    
-
-
-
-
+    update_db()
 

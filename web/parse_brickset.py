@@ -6,8 +6,6 @@ import urllib2
 import urllib
 from bs4 import BeautifulSoup
 
-from waihui import get_huilv
-
 def request_ajax_data(url,data,referer=None,**headers):
     req = urllib2.Request(url)
     req.add_header('Content-Type',

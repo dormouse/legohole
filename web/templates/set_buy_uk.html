@@ -4,31 +4,22 @@
 
 <h1>Buy UK</h1>
 
-{% if objs.table_body %}
-<table class="table table-striped">
+<table data-toggle="table"
+       data-url="/ajax/buy_uk"
+       data-sort-name="discount"
+       data-sort-order="asc"
+       data-query-params="queryParams"
+       data-pagination="true"
+       data-search="true"
+       data-height="800">
     <thead>
         <tr>
             {% for item in objs.table_head %}
-            <th>{{ item }}</th>
+            <th data-field="{{ item[0] }}">{{ item[1] }}</th>
             {% endfor %}
         </tr>
     </thead>
-    <tbody>
-        {% for row in objs.table_body %}
-        <tr>
-            <td>
-                <img src = "{{ row[0] }}">
-            </td>
-            {% for item in row[1:] %}
-            <td>{{ item }}</td>
-            {% endfor %}
-        </tr>
-        {% endfor %}
-    </tbody>
 </table>
-{% else %}
-<em>啥也找不到啊。。。</em>
-{% endif %}
 
 {% endblock %}
 
