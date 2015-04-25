@@ -73,34 +73,27 @@ def index():
 @app.route('/buy_uk')
 def buy_uk():
     objs = {}
-    table_head_field = [
-            'pic', 'set_number', 'name', 'theme', 'year',
-            'price', 'price_rmb', 'discount', 'vendor'
-            ]
+    table_head_field = ['pic', 'detail', 'price', 'price_rmb',
+                        'discount', 'vendor']
 
-    table_head_zh = [
-            'pic', 'set_number', 'name', 'theme', 'year',
-            u'英镑', u'人民币', 'discount', 'vendor'
-            ]
+    table_head_zh = [u'图片', u'说明', u'英镑', u'人民币',
+                     u'折扣', u'供货商']
 
-    objs['table_head'] = zip(table_head_field,
-                                  table_head_zh)
+    objs['table_head'] = zip(table_head_field, table_head_zh)
+
     return render_template('set_buy_uk.html', objs=objs)
 
 @app.route('/ajax/buy_uk')
 def ajax_buy_uk():
-    objs = {}
     #get last update time
-    sql = "select * from update_log where content = 'buy_uk' order by end desc"
-    row = query_db(sql, args=(), one=True)
+    db = LegoDb(g.db)
+    row = db.query_update_log('buy_uk')
     if row:
-        sql = "select * from price where datetime >= ? and datetime <= ?"
-        args = (row['start'], row['end'])
-        prices = query_db(sql, args)
-        objs['table_body'] = []
-        for p in prices:
-            objs['table_body'].append(uk_disc(p))
-    return json.dumps(objs['table_body'])
+        prices = db.query_price(row['start'], row['end'], 'amazon_uk')
+        uk_buy_table_body = [uk_disc(p) for p in prices]
+        return json.dumps(uk_buy_table_body)
+    else:
+        return None
 
 
 def uk_disc(price):
@@ -108,23 +101,36 @@ def uk_disc(price):
     fields = ['thumb_url', 'set_number', 'name', 'theme', 'year',
               'price', 'price_rmb', 'disc', 'vendor']
 
-    objs = {}
-    objs['set_number'] = price['set_number']
-    objs['vendor'] = price['vendor']
+    obj = {}
+    set_number = price['set_number']
+
+    html = '<a href="%s"><span class="label label-info">%s</span></a>'
+    set_number_html = html%(
+            url_for('sets_by_number',set_number=set_number),
+            set_number)
+
+    obj['vendor'] = price['vendor']
 
     #small_pic_url,name,number,theme,year,
     #price_uk,price_uk_rmb,discount
-    objs['pic'] = ''.join(
-        ('<img src ="http://images.brickset.com/sets',
-         '/thumbs/tn_%s_jpg.jpg">'%objs['set_number']))
-    db = LegoDb(g.db)
-    row = db.query_brickset(True, number=objs['set_number'])
-    if row:
-        objs['name'] = row.get('name')
-        objs['theme'] = row.get('theme')
-        objs['year'] = row.get('year')
+    thumb_url = "/static/pic/thumb"
+    obj['pic'] = '<img src ="%s/tn_%s_jpg.jpg">'%(thumb_url, set_number)
 
+    db = LegoDb(g.db)
+    row = db.query_brickset(True, number=set_number)
+    if row:
+        name = row.get('name')
+        theme = row.get('theme')
+        subtheme = row.get('subtheme')
+        year = row.get('year')
         us_rp = row.get('usprice')
+
+    html = '<span class="label label-info">%s</span>'
+    theme_html = html%(theme,)
+    subtheme_html = html%(subtheme,)
+    year_html = html%(year,)
+    obj['detail'] = '<h4>%s<h4>%s %s %s %s'%(name, set_number_html,
+            theme_html, subtheme_html, year_html)
 
     #得到汇率
     huilv = db.query_huilv()
@@ -133,74 +139,40 @@ def uk_disc(price):
 
     #计算折扣
     uk_cp = float(price['price'])
-    objs['price'] = uk_cp
+    obj['price'] = uk_cp
     #英镑退税后人民币当前价格
     uk_cp_rmb = uk_cp * gbp_rate / 1.2
-    objs['price_rmb'] = round(uk_cp_rmb, 2)
+    obj['price_rmb'] = round(uk_cp_rmb, 2)
     try:
         us_rp_rmb = float(us_rp) * usd_rate 
         us_rp_rmb = float(us_rp) * usd_rate 
         #英镑退税后人民币当前价格折扣
         uk_disc = round(uk_cp_rmb/us_rp_rmb*100, 2) 
-        objs['discount'] = uk_disc
+        obj['discount'] = uk_disc
     except:
         pass
 
-    return objs
+    return obj
 
 
 @app.route('/set/number/<set_number>')
 def sets_by_number(set_number):
-    number, variant = set_number.split('-')
-    sql = ' '.join([
-            "select * from",
-            TABLE,
-            "where number=? and variant=?"
-            ])
-    args = (number, variant)
+    sql = ' '.join([ "select * from", TABLE, "where number=?" ])
+    args = (set_number, )
     row = query_db(sql, args, one=True)
-    print 'us$$$', row['usprice']
-    show_items = [{'name':u'名称', 'value':row['name']},
-            {'name':u'编号', 'value':row['number']+'-'+row['variant']},
-            {'name':u'系列', 'value':row['theme']+'-'+row['subtheme']},
-            {'name':u'价格', 'value':row['usprice']},
-            {'name':u'年份', 'value':row['year']},
-            {'name':u'人仔', 'value':row['minifigs']},
-            ]
-    """
-            id integer primary key,
-            setid text,
-            number text,
-            variant text,
-            theme text,
-            subtheme text,
-            year text,
-            name text,
-            minifigs text,
-            pieces text,
-            ukprice text,
-            usprice text,
-            caprice text,
-            euprice text,
-            imageurl text,
-            owned text,
-            wanted text,
-            qtyowned text,
-            add_time text,
-            modi_time text,
-            data_source text)
-            """
-    objs = {}
-    objs['show_items'] = show_items
-    objs['img_url'] = row['imageurl']
+    objs = show_set(row)
     return render_template('set_detail.html', objs=objs)
+
     
 @app.route('/set/id/<set_id>')
 def sets_by_id(set_id):
     sql = ' '.join([ "select * from", TABLE, "where id=?"])
     args = (set_id,)
     row = query_db(sql, args, one=True)
+    objs = show_set(row)
+    return render_template('set_detail.html', objs=objs)
 
+def show_set(row):
     row['price'] = '|'.join([item for item in [
         u'$'+row['usprice'] if row['usprice'] else '',
         u'£'+row['ukprice'] if row['ukprice'] else '',
@@ -223,7 +195,7 @@ def sets_by_id(set_id):
     objs = {}
     objs['show_items'] = show_items
     objs['img_url'] = row['imageurl']
-    return render_template('set_detail.html', objs=objs)
+    return objs
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():

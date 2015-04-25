@@ -136,6 +136,23 @@ class LegoDb():
         row = self.query_db(sql, one = True)
         return row
 
+    def query_price(self, start, end, vendor):
+        sql = """
+            select * from price
+            where datetime >= ?
+                and datetime <= ?
+                and instr(vendor, ?)
+        """
+        args = (start, end, vendor)
+        rows = self.query_db(sql, args)
+        return rows
+
+    def query_update_log(self,content):
+        sql = "select * from update_log where content = ? order by end desc"
+        args = (content,)
+        row = self.query_db(sql, args, one=True)
+        return row
+
     def append_db(self, table, fields, datas):
         sql = '' .join([
             "insert into %s"%table,
@@ -150,15 +167,7 @@ class LegoDb():
 
     def append_prices(self,prices):
         """write price to db"""
-        """
-        fields = ('set_number', 'price', 'vendor', 'datetime')
-        for price in prices:
-            data = ([price[field] for field in fields])
-            sql = u"insert into price (id,set_number,price,vendor,datetime) \
-                values (null,?,?,?,?)"
-            self.cx.execute(sql, data)
-        self.cx.commit()
-        """
+
         fields = ('set_number', 'price', 'vendor', 'datetime')
         self.append_db('price', fields, prices)
 

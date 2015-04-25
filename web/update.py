@@ -1,6 +1,7 @@
 # !/usr/bin/env python
 # -*- coding: UTF-8 -*
 
+import os
 import json
 import urllib2
 import urllib
@@ -98,6 +99,7 @@ def update_buy_uk():
     obj['start'] = datetime.now().strftime("%Y%m%d%H%M%S")
     prices = get_buy_uk()
     db.append_prices(prices)
+    down_thumbs(prices)
     obj['end'] = datetime.now().strftime("%Y%m%d%H%M%S")
     obj['content'] = 'buy_uk'
     db.append_update_log(obj)
@@ -118,8 +120,26 @@ def update_huilv():
     db.disconnect_db()
 
 def update_db():
-    #update_huilv()
+    update_huilv()
     update_buy_uk()
+
+def down_thumbs(prices):
+    urls = [make_thumb_url(price['set_number']) for price in prices]
+    target_path = "/home/dormouse/project/legohole/web/static/pic/thumb"
+    for url in urls:
+        download(url, target_path)
+    #http://images.brickset.com/sets/images/70706-1.jpg
+    #http://images.brickset.com/sets/large/70706-1.jpg
+def make_thumb_url(set_number):
+    imgurl = ''.join(
+        ('http://images.brickset.com/sets',
+         '/thumbs/tn_%s_jpg.jpg'%set_number))
+    return imgurl
+
+def download(url, target_path):
+    fname = os.path.join(target_path, url.split('/')[-1])
+    if not os.path.exists(fname):
+        os.system("wget -nv -P %s %s"%(target_path, url))
 
 if __name__ == '__main__':
     update_db()
