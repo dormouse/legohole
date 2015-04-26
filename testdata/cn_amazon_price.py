@@ -4,12 +4,15 @@ from bs4 import BeautifulSoup
 from urllib import urlopen
 from datetime import datetime
 import re
+import mechanize
+import cookielib
+import urllib2
+import urllib
 
 import parse_brickset
 from waihui import get_huilv
 
 from database import LegoDb
-
 """
 http://www.amazon.cn/s/ref=sr_pg_1?fst=as%3Aoff&rh=n%3A647070051%2Cn%3A1982062051%2Ck%3Alego%2Cp_89%3ALEGO+%E4%B9%90%E9%AB%98&keywords=lego&ie=UTF8&qid=1429923502
 
@@ -22,11 +25,35 @@ for div in divs:
     set_url = base_url + div.a['href']
 """
 def test_url():
-    url = "http://www.amazon.cn/s/ref=sr_pg_1?fst=as%3Aoff&rh=n%3A647070051%2Cn%3A1982062051%2Ck%3Alego%2Cp_89%3ALEGO+%E4%B9%90%E9%AB%98&keywords=lego&ie=UTF8&qid=1429923502"
-    http://www.amazon.cn/s/ref=nb_sb_noss?__mk_zh_CN=%E4%BA%9A%E9%A9%AC%E9%80%8A%E7%BD%91%E7%AB%99&url=node%3D1982062051&field-keywords=lego&rh=n%3A647070051%2Cn%3A1982062051%2Ck%3Alego
+    base_url = "http://www.amazon.cn"
+    url = "http://www.amazon.cn/s/keywords=lego&ie=UTF8"
+
+    html = request_ajax_data(url)
+    obj = parse_html(html)
+    np = obj['next_page']
+    print np
+    html = request_ajax_data(base_url + np)
+    obj = parse_html(html)
+    np = obj['next_page']
+    print np
+
+    
+    """
     while url:
         print url
         url = parse_url(url)
+    """
+def request_ajax_data(url):
+    req = urllib2.Request(url)
+    req.add_header('Content-Type',
+                   'application/x-www-form-urlencoded; charset=UTF-8')
+    req.add_header('X-Requested-With','XMLHttpRequest')
+    req.add_header('User-Agent',
+                   'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 \
+                   (KHTML, like Gecko) Chrome/27.0.1453.116')
+    response = urllib2.urlopen(req)
+    jsonText = response.read()
+    return jsonText
 
 def parse_url(url):
     html = urlopen(url).read()
@@ -52,7 +79,7 @@ def parse_html(html):
         p['discount'] = calc_disc(p)
 
     #next page
-    links = soup.find_all('a', title=u's下一页')
+    links = soup.find_all('a', title=u'下一页')
     print links
     if len(links) == 1:
         link = links[0]['href']
