@@ -4,27 +4,83 @@ from bs4 import BeautifulSoup
 from urllib import urlopen
 from datetime import datetime
 import re
-import mechanize
 import cookielib
 import urllib2
 import urllib
+import requests
+from Crypto.Hash import SHA256
+from datetime import datetime
+from dateutil import tz
+import hmac
+import hashlib
+import base64
 
 import parse_brickset
 from waihui import get_huilv
 
 from database import LegoDb
-"""
-http://www.amazon.cn/s/ref=sr_pg_1?fst=as%3Aoff&rh=n%3A647070051%2Cn%3A1982062051%2Ck%3Alego%2Cp_89%3ALEGO+%E4%B9%90%E9%AB%98&keywords=lego&ie=UTF8&qid=1429923502
 
-base_url = 'http://brickset.com'
-buy_uk_url = '/buy/vendor-amazon/country-uk/order-percentdiscount/page-1'
-text = urlopen(base_url + buy_uk_url).read()
-soup = BeautifulSoup(text)
-divs = soup.find_all('div', class_='tags hideonmediumscreen')
-for div in divs:
-    set_url = base_url + div.a['href']
-"""
+def get_keys():
+    with open('rootkey.csv') as f:
+        texts = f.read().split()
+        keys = dict(zip(
+            ('associate_tag', 'AWS_access_key_id', 'AWS_secret_key'),
+            texts
+        ))
+    return keys
+
+def get_utctime():
+    """
+    function:
+        get utc time for amazon.com
+    return:
+        string like 2014-08-18T12:00:00Z
+    """
+    from_zone = tz.tzutc()
+    to_zone = tz.tzlocal()
+    utc = datetime.utcnow().replace(tzinfo=from_zone)
+    central = utc.astimezone(to_zone)
+    formated_time = central.strftime('%Y-%m-%dT%H:%M:%SZ')
+    return formated_time
+
+def get_url():
+    utc_time = get_utctime()
+    keys = get_keys()
+    pars = {
+        'AWSAccessKeyId':keys['AWS_access_key_id'],
+        'AssociateTag':keys['associate_tag'],
+        'Keywords':'lego toy',
+        'Operation':'ItemSearch',
+        'ResponseGroup':'ItemAttributes,Offers',
+        'SearchIndex':'All',
+        'Service':'AWSECommerceService',
+        'Timestamp':utc_time,
+        'Version':'2011-08-01'
+    }
+    str_pars = '&'.join(
+        ["%s=%s"%(k,urllib.quote(pars[k])) for k in sorted(pars.keys())]
+    )
+    str_unsign = '\n'.join([
+        "GET",
+        "webservices.amazon.cn",
+        "/onca/xml",
+        str_pars
+    ])
+    dig = hmac.new(keys['AWS_secret_key'],
+                   msg=str_unsign,
+                   digestmod=hashlib.sha256).digest()
+    sig = base64.b64encode(dig).decode()
+    sig_pre = urllib.urlencode({'Signature':sig})
+    head = 'http://webservices.amazon.cn/onca/xml?'
+    url = head + str_pars + '&' + sig_pre
+    return url
+
 def test_url():
+    url = get_url()
+    xml = urlopen(url).read()
+    with open('amzon_cn.xml', 'w') as f:
+        f.write(xml)
+    """
     base_url = "http://www.amazon.cn"
     url = "http://www.amazon.cn/s/keywords=lego&ie=UTF8"
 
@@ -38,22 +94,10 @@ def test_url():
     print np
 
     
-    """
     while url:
         print url
         url = parse_url(url)
     """
-def request_ajax_data(url):
-    req = urllib2.Request(url)
-    req.add_header('Content-Type',
-                   'application/x-www-form-urlencoded; charset=UTF-8')
-    req.add_header('X-Requested-With','XMLHttpRequest')
-    req.add_header('User-Agent',
-                   'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 \
-                   (KHTML, like Gecko) Chrome/27.0.1453.116')
-    response = urllib2.urlopen(req)
-    jsonText = response.read()
-    return jsonText
 
 def parse_url(url):
     html = urlopen(url).read()
@@ -63,9 +107,20 @@ def parse_url(url):
 
 def test_text():
     """测试本地文档"""
-    with open('amazon_cn.html') as f:
-        obj = parse_html(f.read())
+    with open('amazon_cn.xml') as f:
+        obj = parse_xml(f.read())
     #write_db(obj['prices'])
+
+def parse_xml(xml):
+    """分析中国亚马逊搜索页面"""
+    soup = BeautifulSoup(xml, "xml")
+    items = soup.find_all('Item')
+    for item in items:
+        print item.ASIN.text,
+        print item.FormattedPrice.text if item.FormattedPrice else '',
+        print item.Model.text if item.Model else ''
+    print len(items)
+
 
 def parse_html(html):
     """分析中国亚马逊搜索页面"""
@@ -195,4 +250,5 @@ def write_db(prices):
 
     
 if __name__ == "__main__":
-    test_url()
+    #test_url()
+    test_text()
