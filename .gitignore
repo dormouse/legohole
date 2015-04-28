@@ -2,4 +2,5 @@
 .*swp
 web/static/pic
 testdata/rootkey.csv
+web/rootkey.csv
 

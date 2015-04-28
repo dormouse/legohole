@@ -3,14 +3,18 @@
 {% block content %}
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-3 sidebar">
-            <table class="table table-striped">
+        <div class="col-md-3 sidebar" >
+            <table class="table table-striped" id="aaa">
             {% for item in objs.show_items %}
                 <tr>
                     <td>{{ item.name }}</td>
                     <td>{{ item.value }}</td>
                 </tr>
-                {% endfor %}
+            {% endfor %}
+                <tr>
+                    <td>中亚价格<td>
+                    <td id='Z_cn_p'>正在查询</td>
+                </tr>
             </table>
         </div>
         <div class="col-md-9 col-md-offset-3 main">
@@ -21,8 +25,32 @@
             <img src="{{ url_for('static', filename='blankbox.gif') }}"
                 alt="暂无图片">
             {% endif %}
-        </div>
+            
         </div>
     </div>
 </div>
+
+
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+
+$(document).ready(function() {
+    $("#Z_cn_p").html( 'please wait.......' ) ;
+    $.ajax({
+        type: "get",
+        url: "/ajax/get_amazon_cn/number/{{ objs.show_items[0]['value'] }}",
+        dataType: "html",
+        success: function(text){
+                $("#Z_cn_p").html( text );
+        },
+
+        error:function(text){
+                $("#Z_cn_p").html("no price");
+
+        }
+	});
+});
+</script>
 {% endblock %}

@@ -16,6 +16,7 @@ import json
 
 import parse_brickset
 from database import LegoDb
+from cn_amazon_price import Amazon
 
 DATABASE = '/home/dormouse/project/legohole/testdata/test.db'
 TABLE = 'brickset'
@@ -154,6 +155,11 @@ def uk_disc(price):
 
     return obj
 
+@app.route('/ajax/get_amazon_cn/number/<set_number>')
+def get_amazon_cn(set_number):
+    number = set_number.split('-')[0]
+    price = Amazon().get_lego_price(number)
+    return price
 
 @app.route('/set/number/<set_number>')
 def sets_by_number(set_number):
