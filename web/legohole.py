@@ -20,6 +20,7 @@ from cn_amazon_price import Amazon
 
 DATABASE = '/home/dormouse/project/legohole/testdata/test.db'
 TABLE = 'brickset'
+KEYFILE = '/home/dormouse/project/legohole/web/rootkey.csv'
 
 app = Flask(__name__)
 
@@ -146,7 +147,6 @@ def uk_disc(price):
     obj['price_rmb'] = round(uk_cp_rmb, 2)
     try:
         us_rp_rmb = float(us_rp) * usd_rate 
-        us_rp_rmb = float(us_rp) * usd_rate 
         #英镑退税后人民币当前价格折扣
         uk_disc = round(uk_cp_rmb/us_rp_rmb*100, 2) 
         obj['discount'] = uk_disc
@@ -158,8 +158,29 @@ def uk_disc(price):
 @app.route('/ajax/get_amazon_cn/number/<set_number>')
 def get_amazon_cn(set_number):
     number = set_number.split('-')[0]
-    price = Amazon().get_lego_price(number)
-    return price
+    amazon = Amazon(KEYFILE)
+    price = amazon.get_lego_price('CN', number=number)
+    if not price:
+        return 'No'
+
+    cn_cp_rmb = float(price)/100
+
+    #计算折扣
+    db = LegoDb(g.db)
+    row = db.query_brickset(True, number=set_number)
+    if row:
+        us_rp = row.get('usprice')
+    if us_rp:
+        #得到汇率
+        huilv = db.query_huilv()
+        usd_rate = float(huilv['usd'])/100
+        us_rp_rmb = float(us_rp) * usd_rate 
+        disc = round(cn_cp_rmb/us_rp_rmb*100, 2) 
+    if disc:
+        formated_price = u"￥%.2f(%.2f%%)"%(cn_cp_rmb, disc)
+    else:
+        formated_price = u"￥%.2f"%cn_cp_rmb
+    return formated_price
 
 @app.route('/set/number/<set_number>')
 def sets_by_number(set_number):

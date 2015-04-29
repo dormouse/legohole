@@ -2,22 +2,11 @@
 # -*- coding: UTF-8 -*
 from bs4 import BeautifulSoup
 from datetime import datetime
-import re
-import cookielib
-import urllib2
 import urllib
-import requests
-from Crypto.Hash import SHA256
-from datetime import datetime
 from dateutil import tz
 import hmac
 import hashlib
 import base64
-
-import parse_brickset
-from waihui import get_huilv
-
-from database import LegoDb
 
 class Amazon():
     """查询 amazon 网站"""
@@ -103,7 +92,7 @@ class Amazon():
             }
 
         url_pars = '&'.join(
-            ["%s=%s"%(k,urllib.quote(pars[k])) for k in sorted(pars.keys())]
+            ["%s=%s"%(k, urllib.quote(pars[k])) for k in sorted(pars.keys())]
         )
         str_unsign = '\n'.join(
             ["GET", endpoints[local], "/onca/xml", url_pars]
@@ -114,17 +103,15 @@ class Amazon():
         sig = base64.b64encode(dig).decode()
         url_sig = urllib.urlencode({'Signature':sig})
         signed_url = "http://%s/onca/xml?%s&%s"%(
-            endpoints[local],url_pars,url_sig
+            endpoints[local], url_pars, url_sig
         )
         return signed_url
-
-
 
     def get_lego_price(self, local, **args):
 
         # default pars
         pars = {
-            'ResponseGroup':'ItemAttributes,Offers',
+            'ResponseGroup':'ItemAttributes,OfferFull'
         }
         # search by ASIN
         if args.get('ASIN'):
@@ -132,7 +119,6 @@ class Amazon():
                 'Operation':'ItemLookup',
                 'ItemId':args.get('ASIN'),
                 'IdType':'ASIN',
-                'ResponseGroup':'ItemAttributes,OfferFull'
             })
         # search by lego number
         if args.get('number'):
@@ -141,6 +127,9 @@ class Amazon():
                 'Keywords':"lego %s"%(args.get('number')),
                 'SearchIndex':'Toys',
             })
+
+        if local != 'CN':
+            pars['MerchantId'] = 'Amazon'
 
         url = self.sign_url(local, pars)
         print url
@@ -161,10 +150,10 @@ class Amazon():
     def parse_xml(self, xml):
         """分析中国亚马逊搜索页面"""
         soup = BeautifulSoup(xml, "xml")
-        items = soup.find_all('Item')
-        if items:
-            item = items[0]
-            amount = item.OfferSummary.LowestNewPrice.Amount
+        offers = soup.find_all('Offer')
+        if offers:
+            offer = offers[0]
+            amount = offer.OfferListing.Price.Amount
             return amount.text if amount else None
         else:
             return None
@@ -176,49 +165,12 @@ class Amazon():
         print len(items)
         """
 
-    def calc_disc(price):
-        """ calc discount"""
-        number = price.get('set_number')
-        if number:
-            set_number = number + '-1'
-        else:
-            return None
-
-        rmb_p = price.get('price')
-        if rmb_p:
-            db = LegoDb()
-            db.connect_db()
-            row = db.query_brickset(True, 'usprice', number=set_number)
-            us_rate = db.query_huilv()['usd']
-            db.disconnect_db()
-            if row and row['usprice']:
-                us_p = float(row['usprice']) * float(us_rate) /100
-                disc = round(float(rmb_p) / us_p * 100, 2)
-            else:
-                return None
-        return disc 
-
-
-    def write_db(prices):
-        """把价格写入数据库"""
-        obj = {}
-        db = LegoDb()
-        db.connect_db()
-        obj['start'] = datetime.now().strftime("%Y%m%d%H%M%S")
-        db.append_prices(prices)
-        obj['end'] = datetime.now().strftime("%Y%m%d%H%M%S")
-        obj['content'] = 'amazon_cn'
-        db.append_update_log(obj)
-        db.disconnect_db()
-
-
-        
 if __name__ == "__main__":
     key_file = '/home/dormouse/project/legohole/web/rootkey.csv'
     amazon = Amazon(key_file)
-    #print amazon.get_lego_price('CN', number='60044')
-    #print amazon.get_lego_price('US', number='60044')
-    print amazon.get_lego_price('US', ASIN='B00GSPF9QQ') 
+    print amazon.get_lego_price('CN', number='60044')
+    #print amazon.get_lego_price('US', number='60046')
+    #print amazon.get_lego_price('US', ASIN='B00GSPF9QQ') 
     #print amazon.get_lego_price('UK', number='60044')
     #print amazon.get_lego_price('CN', ASIN='B00VG1X1JY') 
     #fname = '/home/dormouse/project/legohole/testdata/amazon_cn.xml'
