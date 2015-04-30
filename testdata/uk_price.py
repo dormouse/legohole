@@ -18,25 +18,25 @@ divs = soup.find_all('div', class_='tags hideonmediumscreen')
 for div in divs:
     set_url = base_url + div.a['href']
 """
-def test_uk_url():
-    base_url = 'http://brickset.com'
-    buy_uk_url = '/buy/vendor-amazon/country-uk/order-percentdiscount/page-1'
-    text = urlopen(base_url + buy_uk_url).read()
-    parse_buy_UK(text)
+def test_url():
+    url = 'http://cn.ipricetracker.com/search?type=amazon&q=lego+60044'
+    html = urlopen(url).read()
+    with open('aa.html','w') as f:
+        f.write(html)
+    #print parse_html(html)
 
 def test_uk_text():
     """测试本地文档"""
     with open('buy_uk.html') as f:
         parse_buy_UK(f.read())
 
-def parse_buy_UK(html):
-    """分析英国折扣页面"""
+def parse_html(html):
 
     soup = BeautifulSoup(html)
-    table = soup.find_all('table', class_='neattable')[0]
-    trs = table.tbody.find_all('tr')
-    prices = [parse_buy_uk_tr(tr) for tr in trs]
-    write_db(prices)
+    tr = soup.find_all('tr', class_='search_tr')[0]
+    div = tr.find_all('div', class_='price')[0]
+    print div.text
+
 
 def parse_buy_uk_tr(tr):
 
@@ -72,4 +72,4 @@ def write_db(prices):
 
     
 if __name__ == "__main__":
-    test_uk_url()
+    test_url()
