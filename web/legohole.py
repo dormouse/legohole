@@ -72,39 +72,58 @@ def index():
     objs = get_sets_table(sql)
     return render_template('index.html', objs=objs)
 
-@app.route('/buy_uk')
-def buy_uk():
+@app.route('/buy/<local>')
+def buy_uk(local):
     objs = {}
-    table_head_field = ['pic', 'detail', 'price', 'price_rmb',
-                        'discount', 'vendor']
+    if local == 'uk':
+        title = u'英国亚马逊折扣'
+        table_head_field = ['pic', 'detail', 'price', 'price_rmb',
+            'discount', 'vendor']
+        table_head_zh = [u'图片', u'说明', u'英镑', u'人民币',
+            u'折扣', u'供货商']
+        ajax_url = '/ajax/buy/uk'
+    if local == 'cn':
+        title = u'中国亚马逊折扣'
+        table_head_field = ['pic', 'detail', 'price_rmb',
+            'discount', 'vendor']
+        table_head_zh = [u'图片', u'说明', u'人民币',
+            u'折扣', u'供货商']
+        ajax_url = '/ajax/buy/cn'
 
-    table_head_zh = [u'图片', u'说明', u'英镑', u'人民币',
-                     u'折扣', u'供货商']
 
+    objs['ajax_url'] = ajax_url
+    objs['title'] = title
     objs['table_head'] = zip(table_head_field, table_head_zh)
 
-    return render_template('set_buy_uk.html', objs=objs)
+    return render_template('set_buy.html', objs=objs)
 
-@app.route('/ajax/buy_uk')
-def ajax_buy_uk():
+@app.route('/ajax/buy/<local>')
+def ajax_buy(local):
     #get last update time
     db = LegoDb(g.db)
-    row = db.query_update_log('buy_uk')
-    if row:
-        prices = db.query_price(row['start'], row['end'], 'amazon_uk')
-        uk_buy_table_body = [uk_disc(p) for p in prices]
-        return json.dumps(uk_buy_table_body)
-    else:
-        return None
+    if local == 'uk':
+        row = db.query_update_log('buy_uk')
+        if row:
+            prices = db.query_price(row['start'], row['end'], 'amazon_uk')
+            buy_table_body = filter(None, [get_body(p, 'uk') for p in prices])
+            return json.dumps(buy_table_body)
+    if local == 'cn':
+        row = db.query_update_log('amazon_cn')
+        print row
+        if row:
+            prices = db.query_price(row['start'], row['end'], 'amazon_cn')
+            print 'prices', prices
+            buy_table_body = filter(None, [get_body(p, 'cn') for p in prices])
+            return json.dumps(buy_table_body)
+    return None
 
 
-def uk_disc(price):
+def get_body(price, local):
     """ caculate uk price discount"""
-    fields = ['thumb_url', 'set_number', 'name', 'theme', 'year',
-              'price', 'price_rmb', 'disc', 'vendor']
 
     obj = {}
     set_number = price['set_number']
+    obj['discount'] = price['discount']
 
     html = '<a href="%s"><span class="label label-info">%s</span></a>'
     set_number_html = html%(
@@ -126,6 +145,8 @@ def uk_disc(price):
         subtheme = row.get('subtheme')
         year = row.get('year')
         us_rp = row.get('usprice')
+    else:
+        return None
 
     html = '<span class="label label-info">%s</span>'
     theme_html = html%(theme,)
@@ -134,24 +155,17 @@ def uk_disc(price):
     obj['detail'] = '<h4>%s<h4>%s %s %s %s'%(name, set_number_html,
             theme_html, subtheme_html, year_html)
 
-    #得到汇率
-    huilv = db.query_huilv()
-    gbp_rate = float(huilv['gbp'])/100
-    usd_rate = float(huilv['usd'])/100
+    if local == 'uk':
+        #得到英镑退税后人民币当前价格
+        huilv = db.query_huilv()
+        gbp_rate = float(huilv['gbp'])/100
+        uk_cp = float(price['price'])
+        obj['price'] = uk_cp
+        uk_cp_rmb = uk_cp * gbp_rate / 1.2
+        obj['price_rmb'] = round(uk_cp_rmb, 2)
+    if local == 'cn':
+        obj['price_rmb'] = price['price']
 
-    #计算折扣
-    uk_cp = float(price['price'])
-    obj['price'] = uk_cp
-    #英镑退税后人民币当前价格
-    uk_cp_rmb = uk_cp * gbp_rate / 1.2
-    obj['price_rmb'] = round(uk_cp_rmb, 2)
-    try:
-        us_rp_rmb = float(us_rp) * usd_rate 
-        #英镑退税后人民币当前价格折扣
-        uk_disc = round(uk_cp_rmb/us_rp_rmb*100, 2) 
-        obj['discount'] = uk_disc
-    except:
-        pass
 
     return obj
 

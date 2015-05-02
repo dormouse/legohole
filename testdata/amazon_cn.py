@@ -27,8 +27,7 @@ def parse_url(url):
     browser.get(url)
     html = browser.page_source
     obj = parse_html(html)
-    write_db(obj['prices'])
-    return obj['next_page']
+    return obj
 
 def test_text():
     """测试本地文档"""
@@ -131,25 +130,33 @@ def parse_div(div):
         return {}
 
     # init return obj 
-    obj = {'set_number':set_number, 'price':price }
+    obj = {'vendor':u'amazon_cn', 'price':price }
+    obj['set_number'] = set_number+'-1'
     obj['datetime'] = datetime.now().strftime("%Y%m%d%H%M%S")
-    obj['vendor'] = u'amazon_cn'
 
     return obj
 
-def write_db(prices):
+def write_db():
     """把价格写入数据库"""
     obj = {}
+    prices = []
+    obj['start'] = datetime.now().strftime("%Y%m%d%H%M%S")
+    url = START
+    while url:
+        print url
+        result = parse_url(url)
+        url = result['next_page']
+        prices += result['prices']
+        random.seed()
+        time.sleep(random.random()*20)
+    obj['end'] = datetime.now().strftime("%Y%m%d%H%M%S")
     db = LegoDb()
     db.connect_db()
-    obj['start'] = datetime.now().strftime("%Y%m%d%H%M%S")
     db.append_prices(prices)
-    obj['end'] = datetime.now().strftime("%Y%m%d%H%M%S")
     obj['content'] = 'amazon_cn'
     db.append_update_log(obj)
     db.disconnect_db()
-
-
     
 if __name__ == "__main__":
-    test_url()
+    #test_url()
+    write_db()

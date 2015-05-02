@@ -64,13 +64,14 @@ class LegoDb():
 
         if name == 'price':
             self.cx.execute("drop table if exists price")
-            init_sql = """create table price (
-                    id integer primary key,
-                    set_number text,
-                    price text,
-                    vendor text,
-                    datetime text
-                    )"""
+            init_sql = """CREATE TABLE "price" (
+                "id" integer PRIMARY KEY ,
+                "set_number" text,
+                "price" text,
+                "discount" float DEFAULT (null) ,
+                "vendor" text,
+                "datetime" text
+                )"""
             self.cx.execute(init_sql)
 
         if name == 'update_log':
@@ -164,11 +165,10 @@ class LegoDb():
             self.cx.execute(sql, args)
         self.cx.commit()
 
-
     def append_prices(self,prices):
         """write price to db"""
 
-        fields = ('set_number', 'price', 'vendor', 'datetime')
+        fields = ('set_number', 'price', 'discount', 'vendor', 'datetime')
         self.append_db('price', fields, prices)
 
 
@@ -199,8 +199,13 @@ if __name__ == '__main__':
     #print db.query_brickset_by_set_number('60052-1')
     #print db.query_huilv()
     #db.create_table('price')
-    db.query_brickset(True, 'number', id='333', number=444)
-    db.query_brickset(True, id='333', number=444)
-    db.query_brickset(True)
+    prices = [
+            {'vendor': u'amazon_uk', 'price': u'3.49', 
+                'datetime': '20150501123955', 'discount': 34.39, 
+                'set_number': u'70155-1', 'local': 'uk'}, ]
+    db.append_prices(prices)
+    #db.query_brickset(True, 'number', id='333', number=444)
+    #db.query_brickset(True, id='333', number=444)
+    #db.query_brickset(True)
     db.disconnect_db()
 

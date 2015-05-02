@@ -57,7 +57,7 @@ def get_buy_uk():
     prices = []
     for i in range(1,4):
         html = urllib.urlopen(base_url + buy_uk_url + '%s'%i).read()
-        prices +=parse_buy_uk(html)
+        prices += parse_buy_uk(html)
 
         print base_url + buy_uk_url + '%s'%i
     print len(prices)
@@ -69,7 +69,9 @@ def parse_buy_uk(html):
     soup = BeautifulSoup(html)
     table = soup.find_all('table', class_='neattable')[0]
     trs = table.tbody.find_all('tr')
-    prices = [parse_buy_uk_tr(tr) for tr in trs]
+    prices = filter(None, [parse_buy_uk_tr(tr) for tr in trs])
+    for p in prices:
+        p['discount'] = calc_disc(p)
     return prices
 
 def parse_buy_uk_tr(tr):
@@ -88,8 +90,64 @@ def parse_buy_uk_tr(tr):
     price = price_span.text
     obj['price'] = price[1:] 
     obj['datetime'] = datetime.now().strftime("%Y%m%d%H%M%S")
+    obj['local'] = 'uk'
 
     return obj
+
+def get_huilv_from_db(local):
+    db = LegoDb()
+    db.connect_db()
+    row = db.query_huilv()
+    db.disconnect_db()
+    try:
+        rate = float(row[local])/100
+    except:
+        print "can not get %s exchange rate"%local
+        rate = None
+    return rate
+
+def calc_disc(price):
+    """ calc discount"""
+
+    #check number and price
+    try:
+        number = price['set_number']
+        cp = float(price['price'])
+    except:
+        print 'can not get set_number and price'
+        return None
+
+    db = LegoDb()
+
+    #得到美元零售人民币价格
+    usd_rate = get_huilv_from_db('usd')
+    if not usd_rate:
+        return None
+    db.connect_db()
+    row = db.query_brickset(True, 'usprice', number=number)
+    db.disconnect_db()
+    if row and row['usprice']:
+        us_rp_rmb = float(row['usprice'])*usd_rate
+    else:
+        return None
+
+    cp_rmb = None
+    if price['local'] == 'uk':
+        #得到英镑汇率
+        gbp_rate = get_huilv_from_db('gbp')
+        if not gbp_rate:
+            return None
+        #英镑退税后人民币当前价格
+        cp_rmb = cp*gbp_rate/1.2
+
+    if price['local'] == 'cn':
+        cp_rmb = cp
+
+    if cp_rmb:
+        disc = round(cp_rmb/us_rp_rmb*100, 2) 
+    else:
+        disc = None
+    return disc 
 
 def update_buy_uk():
     """把价格写入数据库"""
@@ -141,6 +199,19 @@ def download(url, target_path):
     if not os.path.exists(fname):
         os.system("wget -nv -P %s %s"%(target_path, url))
 
+def test():
+    base_url = 'http://brickset.com'
+    buy_uk_url = '/buy/vendor-amazon/country-uk/order-percentdiscount/page-1'
+    html = urllib.urlopen(base_url + buy_uk_url).read()
+    prices = parse_buy_uk(html)
+    db = LegoDb()
+    db.connect_db()
+    db.append_prices(prices[:3])
+    db.disconnect_db()
+    print len(prices)
+    print prices[:3]
+
 if __name__ == '__main__':
     update_db()
+    #test()
 
