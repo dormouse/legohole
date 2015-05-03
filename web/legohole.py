@@ -76,69 +76,44 @@ def index():
 def buy_uk(local):
     db = LegoDb(g.db)
     objs = {}
+    price_filter = request.args.items()
     if local == 'uk':
         title = u'英国亚马逊折扣'
         table_head_field = ['pic', 'detail', 'price', 'price_rmb',
             'discount', 'vendor']
-        table_head_zh = [u'图片', u'说明', u'价格',
-            u'折扣', u'供货商']
-        row = db.query_update_log('buy_uk')
-        if row:
-            prices = db.query_price(row['start'], row['end'], 'amazon_uk')
-            body = filter(None, [get_body(p, 'uk') for p in prices])
+        log_tag = 'buy_uk'
+        vendor = 'amazon_uk'
     if local == 'cn':
         title = u'中国亚马逊折扣'
         table_head_field = ['pic', 'detail', 'price_rmb',
             'discount', 'vendor']
-        table_head_zh = [u'图片', u'说明', u'价格',
-            u'折扣', u'供货商']
-        row = db.query_update_log('amazon_cn')
-        if row:
-            prices = db.query_price(row['start'], row['end'], 'amazon_cn')
-            body = filter(None, [get_body(p, 'cn') for p in prices])
+        log_tag = 'amazon_cn'
+        vendor = 'amazon_cn'
+
+    table_head_zh = [u'图片', u'说明', u'价格', u'折扣', u'供货商']
+    row = db.query_update_log(log_tag)
+    if row:
+        prices = db.query_price(row['start'], row['end'], vendor, price_filter)
+        body = filter(None, [get_body(p, local) for p in prices])
 
     objs['title'] = title
     objs['table_head'] = table_head_zh
     objs['table_body'] = body
-    print body
     return render_template('set_buy.html', objs=objs)
 
 def get_body(price, local):
     """ prepare body content """
 
-    obj = {}
-    set_number = price['set_number']
-    obj['discount'] = price['discount']
-    obj['set_number'] = price['set_number']
-    obj['vendor'] = price['vendor']
-
-    #small_pic_url,name,number,theme,year,
-    #price_uk,price_uk_rmb,discount
-    thumb_url_base = "/static/pic/thumb"
-    obj['thumb_url'] = "%s/tn_%s_jpg.jpg"%(thumb_url_base, set_number)
-
     db = LegoDb(g.db)
-    row = db.query_brickset(True, number=set_number)
-    if row:
-        obj['name'] = row.get('name')
-        obj['theme'] = row.get('theme')
-        obj['subtheme'] = row.get('subtheme')
-        obj['year'] = row.get('year')
-        us_rp = row.get('usprice')
-    else:
-        return None
+    obj = price.copy()
+    thumb_url_base = "/static/pic/thumb"
+    obj['thumb_url'] = "%s/tn_%s_jpg.jpg"%(thumb_url_base, obj['set_number'])
 
     if local == 'uk':
         #得到英镑退税后人民币当前价格
         huilv = db.query_huilv()
         gbp_rate = float(huilv['gbp'])/100
-        uk_cp = float(price['price'])
-        obj['price'] = uk_cp
-        uk_cp_rmb = uk_cp * gbp_rate / 1.2
-        obj['price_rmb'] = round(uk_cp_rmb, 2)
-    if local == 'cn':
-        obj['price'] = price['price']
-
+        obj['price_rmb'] = round(float(obj['price'])*gbp_rate/1.2, 2)
 
     return obj
 

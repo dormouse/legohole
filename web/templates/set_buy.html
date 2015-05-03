@@ -1,8 +1,31 @@
 {% extends "layout.html" %}
 
+{% block sidebar %}
+       <div class="col-sm-3 col-md-2 sidebar">
+          <ul class="nav nav-sidebar">
+            <li class="active"><a href="#">Overview <span class="sr-only">(current)</span></a></li>
+            <li><a href="#">Reports</a></li>
+            <li><a href="#">Analytics</a></li>
+            <li><a href="#">Export</a></li>
+          </ul>
+          <ul class="nav nav-sidebar">
+            <li><a href="">Nav item</a></li>
+            <li><a href="">Nav item again</a></li>
+            <li><a href="">One more nav</a></li>
+            <li><a href="">Another nav item</a></li>
+            <li><a href="">More navigation</a></li>
+          </ul>
+          <ul class="nav nav-sidebar">
+            <li><a href="">Nav item again</a></li>
+            <li><a href="">One more nav</a></li>
+            <li><a href="">Another nav item</a></li>
+          </ul>
+        </div>
+{% endblock %}
+
 {% block content %}
 
-<div class="container">
+<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
     <h2>{{ objs.title }}</h2>
     <table class="table table-striped">
         <thead>
@@ -18,18 +41,21 @@
                 <td><img src ="{{ item.thumb_url }}"></img></td>
                 <td>
                     <h4>{{ item.name }}</h4>
-                    <a href="{{ url_for('sets_by_number',set_number=item.set_number) }}">
-                        <span class="label label-info">{{ item.set_number }}</span>
-                    </a>
-                    <a href="?theme={{ item.theme }}">
-                        <span class="label label-info">{{ item.theme }}</span>
-                    </a>
-                    <a href="?subtheme={{ item.subtheme }}">
-                        <span class="label label-info">{{ item.subtheme }}</span>
-                    </a>
-                    <a href="?year={{ item.year }}">
-                        <span class="label label-info">{{ item.year }}</span>
-                    </a>
+                    <a class="btn btn-info"
+                        href="{{ url_for('sets_by_number',
+                            set_number=item.set_number) }}"
+                        role="button">{{ item.set_number }}</a>
+                    <a class="btn btn-info"
+                        href="?theme={{ item.theme }}"
+                        role="button">{{ item.theme }}</a>
+                    {% if item.subtheme %}
+                    <a class="btn btn-info"
+                        href="?subtheme={{ item.subtheme }}"
+                        role="button">{{ item.subtheme }}</a>
+                    {% endif %}
+                    <a class="btn btn-info"
+                        href="?year={{ item.year }}"
+                        role="button">{{ item.year }}</a>
                 </td>
                 <td>
                     {{ item.price }}

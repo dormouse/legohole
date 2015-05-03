@@ -123,14 +123,18 @@ class LegoDb():
         row = self.query_db(sql, one = True)
         return row
 
-    def query_price(self, start, end, vendor):
-        sql = """
-            select * from price
-            where datetime >= ?
-                and datetime <= ?
-                and instr(vendor, ?)
-        """
-        args = (start, end, vendor)
+    def query_price(self, start, end, vendor, price_filter):
+        sqls =['select * from price',
+            'join brickset on brickset.number = price.set_number',
+            'where datetime >= ?',
+            'and datetime <= ?',
+            'and instr(vendor, ?)',
+            'and discount < 100',
+            'and %s'%'and '.join(["%s=?"%k for k,v in price_filter])
+                if price_filter else '',
+            'ORDER BY discount',]
+        sql = ' '.join(sqls)
+        args = [start, end, vendor] + [v for k,v in price_filter]
         rows = self.query_db(sql, args)
         return rows
 
