@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="container">
+    <h2>{{ objs.title }}</h2>
+    <table data-toggle="table"
+        data-url="{{ objs.ajax_url }}"
+           data-sort-name="discount"
+           data-sort-order="asc"
+           data-query-params="queryParams"
+           data-pagination="true"
+           data-show-refresh="true"
+           data-show-toggle="true"
+           data-show-columns="true"
+           data-search="true"
+           data-height="700"
+           data-page-size="150">
+        <thead>
+            <tr>
+                {% for item in objs.table_head %}
+                <th data-field="{{ item[0] }}">{{ item[1] }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+    </table>
+</div>
+
+{% endblock %}
+
+

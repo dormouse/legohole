@@ -5,8 +5,8 @@ import os
 import json
 import urllib2
 import urllib
-from bs4 import BeautifulSoup
 import sqlite3 as sqlite
+from bs4 import BeautifulSoup
 from datetime import datetime
 
 from database import LegoDb

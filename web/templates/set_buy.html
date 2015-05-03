@@ -4,25 +4,48 @@
 
 <div class="container">
     <h2>{{ objs.title }}</h2>
-    <table data-toggle="table"
-        data-url="{{ objs.ajax_url }}"
-           data-sort-name="discount"
-           data-sort-order="asc"
-           data-query-params="queryParams"
-           data-pagination="true"
-           data-show-refresh="true"
-           data-show-toggle="true"
-           data-show-columns="true"
-           data-search="true"
-           data-height="700"
-           data-page-size="150">
+    <table class="table table-striped">
         <thead>
             <tr>
                 {% for item in objs.table_head %}
-                <th data-field="{{ item[0] }}">{{ item[1] }}</th>
+                <th>{{ item }}</th>
                 {% endfor %}
             </tr>
         </thead>
+        <tbody>
+            {% for item in objs.table_body %}
+            <tr>
+                <td><img src ="{{ item.thumb_url }}"></img></td>
+                <td>
+                    <h4>{{ item.name }}</h4>
+                    <a href="{{ url_for('sets_by_number',set_number=item.set_number) }}">
+                        <span class="label label-info">{{ item.set_number }}</span>
+                    </a>
+                    <a href="?theme={{ item.theme }}">
+                        <span class="label label-info">{{ item.theme }}</span>
+                    </a>
+                    <a href="?subtheme={{ item.subtheme }}">
+                        <span class="label label-info">{{ item.subtheme }}</span>
+                    </a>
+                    <a href="?year={{ item.year }}">
+                        <span class="label label-info">{{ item.year }}</span>
+                    </a>
+                </td>
+                <td>
+                    {{ item.price }}
+                    {% if item.price_rmb %}
+                    <br>(￥{{ item.price_rmb }})
+                    {% endif %}
+                </td>
+                <td>
+                    {{ item.discount}}
+                </td>
+                <td>
+                    {{ item.vendor}}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
 </div>
 

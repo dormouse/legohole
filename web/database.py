@@ -89,23 +89,9 @@ class LegoDb():
     def query_db(self, sql, args=(), one=False):
         cur = self.cx.execute(sql, args)
         rv = [dict((cur.description[idx][0], value)
-                   for idx, value in enumerate(row)) for row in cur.fetchall()]
+            for idx, value in enumerate(row))
+                for row in cur.fetchall()]
         return (rv[0] if rv else None) if one else rv
-
-    def query_brickset_by_brickset_id(self, brickset_id):
-        """查询 brickset 表中 setid 是否存在"""
-
-        sql = 'select * from brickset where brickset_id = ?'
-        args = (brickset_id,)
-        rvs = self.query_db(sql, args)
-        found_rows = len(rvs)
-        if found_rows == 1:
-            return True
-        if found_rows == 0:
-            return False
-        if found_rows > 1:
-            print 'error:mulity setid:%s'%(args[0])
-            return False
 
     def query_brickset(self, one=False, *fields, **filters):
         """
@@ -118,10 +104,10 @@ class LegoDb():
         """
         fieldstr = ','.join(fields) if fields else '*'
         if filters:
-            flist = [(k,v) for k,v in filters.items()]
-            wlist = ["%s = ?"%k for k,v in flist]
-            wherestr = 'where ' + ' and '.join(wlist)
-            args = [v for k,v in flist]
+            wherestr = 'where ' + ' and '.join(
+                ["%s=?"%k for k,v in filters.items()]
+            )
+            args = [v for k,v in filters.items()]
         else:
             wherestr = ''
             args = ()
@@ -155,57 +141,58 @@ class LegoDb():
         return row
 
     def append_db(self, table, fields, datas):
+        """
+        function:
+            append datas to db
+        Note:
+            datas can be list or dict
+        """
+
         sql = '' .join([
             "insert into %s"%table,
             "(id,%s)"%','.join(fields),
             "values (null,%s)"%','.join('?'*len(fields))
         ])
-        for data in datas:
-            args = ([data[field] for field in fields])
-            self.cx.execute(sql, args)
+
+        if isinstance(datas, list):
+            args = [([data[field] for field in fields]) for data in datas]
+            self.cx.executemany(sql, args)
+        else:
+            for data in datas:
+                args = ([datas[field] for field in fields])
+                self.cx.execute(sql, args)
         self.cx.commit()
 
-    def append_prices(self,prices):
-        """write price to db"""
+    def append_prices(self, datas):
+        """append price to db"""
 
+        table = 'price'
         fields = ('set_number', 'price', 'discount', 'vendor', 'datetime')
-        self.append_db('price', fields, prices)
+        self.append_db(table, fields, datas)
 
-
-    def append_huilv(self, huilv):
+    def append_huilv(self, datas):
         """ append current huilv to db"""
 
+        table = 'huilv'
         fields = ('usd', 'gbp', 'eur', 'cad', 'datetime')
-        data = ([huilv[field] for field in fields])
-        sql = u"insert into huilv (id,usd,gbp,eur,cad,datetime) \
-            values (null,?,?,?,?,?)"
-        self.cx.execute(sql, data)
-        self.cx.commit()
+        self.append_db(table, fields, datas)
 
-    def append_update_log(self,log):
+    def append_update_log(self, datas):
         """write update_log to db"""
+
+        table = 'update_log'
         fields = ('start', 'end', 'content')
-        data = ([log[field] for field in fields])
-        sql = u"insert into update_log(id,start,end,content)\
-                values (null,?,?,?)"
-        self.cx.execute(sql, data)
-        self.cx.commit()
+        self.append_db(table, fields, datas)
 
 if __name__ == '__main__':
     db = LegoDb()
     db.connect_db()
-    #print LegoDb().query_brickset_setid('8088')
     #LegoDb().create_view('brickset_number_view')
     #print db.query_brickset_by_set_number('60052-1')
     #print db.query_huilv()
     #db.create_table('price')
-    prices = [
-            {'vendor': u'amazon_uk', 'price': u'3.49', 
-                'datetime': '20150501123955', 'discount': 34.39, 
-                'set_number': u'70155-1', 'local': 'uk'}, ]
-    db.append_prices(prices)
-    #db.query_brickset(True, 'number', id='333', number=444)
-    #db.query_brickset(True, id='333', number=444)
+    #db.query_brickset(True, 'number', number=444)
+    print db.query_brickset(True, number='8088-1')
     #db.query_brickset(True)
     db.disconnect_db()
 

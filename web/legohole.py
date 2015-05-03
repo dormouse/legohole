@@ -72,88 +72,61 @@ def index():
     objs = get_sets_table(sql)
     return render_template('index.html', objs=objs)
 
-@app.route('/buy/<local>')
+@app.route('/buy/<local>/')
 def buy_uk(local):
+    db = LegoDb(g.db)
     objs = {}
     if local == 'uk':
         title = u'英国亚马逊折扣'
         table_head_field = ['pic', 'detail', 'price', 'price_rmb',
             'discount', 'vendor']
-        table_head_zh = [u'图片', u'说明', u'英镑', u'人民币',
+        table_head_zh = [u'图片', u'说明', u'价格',
             u'折扣', u'供货商']
-        ajax_url = '/ajax/buy/uk'
+        row = db.query_update_log('buy_uk')
+        if row:
+            prices = db.query_price(row['start'], row['end'], 'amazon_uk')
+            body = filter(None, [get_body(p, 'uk') for p in prices])
     if local == 'cn':
         title = u'中国亚马逊折扣'
         table_head_field = ['pic', 'detail', 'price_rmb',
             'discount', 'vendor']
-        table_head_zh = [u'图片', u'说明', u'人民币',
+        table_head_zh = [u'图片', u'说明', u'价格',
             u'折扣', u'供货商']
-        ajax_url = '/ajax/buy/cn'
-
-
-    objs['ajax_url'] = ajax_url
-    objs['title'] = title
-    objs['table_head'] = zip(table_head_field, table_head_zh)
-
-    return render_template('set_buy.html', objs=objs)
-
-@app.route('/ajax/buy/<local>')
-def ajax_buy(local):
-    #get last update time
-    db = LegoDb(g.db)
-    if local == 'uk':
-        row = db.query_update_log('buy_uk')
-        if row:
-            prices = db.query_price(row['start'], row['end'], 'amazon_uk')
-            buy_table_body = filter(None, [get_body(p, 'uk') for p in prices])
-            return json.dumps(buy_table_body)
-    if local == 'cn':
         row = db.query_update_log('amazon_cn')
-        print row
         if row:
             prices = db.query_price(row['start'], row['end'], 'amazon_cn')
-            print 'prices', prices
-            buy_table_body = filter(None, [get_body(p, 'cn') for p in prices])
-            return json.dumps(buy_table_body)
-    return None
+            body = filter(None, [get_body(p, 'cn') for p in prices])
 
+    objs['title'] = title
+    objs['table_head'] = table_head_zh
+    objs['table_body'] = body
+    print body
+    return render_template('set_buy.html', objs=objs)
 
 def get_body(price, local):
-    """ caculate uk price discount"""
+    """ prepare body content """
 
     obj = {}
     set_number = price['set_number']
     obj['discount'] = price['discount']
-
-    html = '<a href="%s"><span class="label label-info">%s</span></a>'
-    set_number_html = html%(
-            url_for('sets_by_number',set_number=set_number),
-            set_number)
-
+    obj['set_number'] = price['set_number']
     obj['vendor'] = price['vendor']
 
     #small_pic_url,name,number,theme,year,
     #price_uk,price_uk_rmb,discount
-    thumb_url = "/static/pic/thumb"
-    obj['pic'] = '<img src ="%s/tn_%s_jpg.jpg">'%(thumb_url, set_number)
+    thumb_url_base = "/static/pic/thumb"
+    obj['thumb_url'] = "%s/tn_%s_jpg.jpg"%(thumb_url_base, set_number)
 
     db = LegoDb(g.db)
     row = db.query_brickset(True, number=set_number)
     if row:
-        name = row.get('name')
-        theme = row.get('theme')
-        subtheme = row.get('subtheme')
-        year = row.get('year')
+        obj['name'] = row.get('name')
+        obj['theme'] = row.get('theme')
+        obj['subtheme'] = row.get('subtheme')
+        obj['year'] = row.get('year')
         us_rp = row.get('usprice')
     else:
         return None
-
-    html = '<span class="label label-info">%s</span>'
-    theme_html = html%(theme,)
-    subtheme_html = html%(subtheme,)
-    year_html = html%(year,)
-    obj['detail'] = '<h4>%s<h4>%s %s %s %s'%(name, set_number_html,
-            theme_html, subtheme_html, year_html)
 
     if local == 'uk':
         #得到英镑退税后人民币当前价格
@@ -164,7 +137,7 @@ def get_body(price, local):
         uk_cp_rmb = uk_cp * gbp_rate / 1.2
         obj['price_rmb'] = round(uk_cp_rmb, 2)
     if local == 'cn':
-        obj['price_rmb'] = price['price']
+        obj['price'] = price['price']
 
 
     return obj
