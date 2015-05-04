@@ -76,7 +76,12 @@ def index():
 def buy_uk(local):
     db = LegoDb(g.db)
     objs = {}
-    price_filter = request.args.items()
+    body = []
+    args = request.args.to_dict()
+    if not args:
+        args.update({'discount':'70'})
+    price_filter = args.items()
+
     if local == 'uk':
         title = u'英国亚马逊折扣'
         table_head_field = ['pic', 'detail', 'price', 'price_rmb',
@@ -93,9 +98,24 @@ def buy_uk(local):
     table_head_zh = [u'图片', u'说明', u'价格', u'折扣', u'供货商']
     row = db.query_update_log(log_tag)
     if row:
+        update_date = row['end'][:8]
         prices = db.query_price(row['start'], row['end'], vendor, price_filter)
-        body = filter(None, [get_body(p, local) for p in prices])
+        if prices:
+            body = filter(None, [get_body(p, local) for p in prices])
+    else:
+        update_date = u'大约在冬季'
 
+    #make theme, subtheme, year url
+    for arg in ['theme', 'subtheme', 'year', 'discount']:
+        args_copy = args.copy()
+        if args.get(arg):
+            args_copy.pop(arg)
+        items = args_copy.items()
+        items.append((arg, ''))
+        objs[arg+'_url'] = '?'+'&'.join('%s=%s'%(k,v) for k,v in items)
+    
+    objs['update_date'] = update_date
+    objs['discount'] = args.get('discount')
     objs['title'] = title
     objs['table_head'] = table_head_zh
     objs['table_body'] = body

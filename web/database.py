@@ -124,17 +124,21 @@ class LegoDb():
         return row
 
     def query_price(self, start, end, vendor, price_filter):
-        sqls =['select * from price',
+        #check filter
+        avaliable_filter = ['theme', 'subtheme', 'year', 'discount']
+        for k,v in price_filter:
+            if k not in avaliable_filter:
+                return None
+        wheres = ['where datetime >= ?', 'datetime <= ?', 'instr(vendor, ?)']
+        args = [start, end, vendor]
+        wheres += ["%s=?"%k for k,v in price_filter if k != 'discount']
+        args += [v for k,v in price_filter if k != 'discount']
+        wheres += ["%s<=?"%k for k,v in price_filter if k == 'discount']
+        args += [v for k,v in price_filter if k == 'discount']
+        sql = ' '.join(['select * from price',
             'join brickset on brickset.number = price.set_number',
-            'where datetime >= ?',
-            'and datetime <= ?',
-            'and instr(vendor, ?)',
-            'and discount < 100',
-            'and %s'%'and '.join(["%s=?"%k for k,v in price_filter])
-                if price_filter else '',
-            'ORDER BY discount',]
-        sql = ' '.join(sqls)
-        args = [start, end, vendor] + [v for k,v in price_filter]
+            ' and '.join(wheres),
+            'ORDER BY discount',])
         rows = self.query_db(sql, args)
         return rows
 
