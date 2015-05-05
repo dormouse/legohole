@@ -63,11 +63,11 @@
     </div>
 
     <!-- Bootstrap core JavaScript
+    <script src="{{ url_for('static', filename='docs.min.js') }}"></script>
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
     <script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='docs.min.js') }}"></script>
     {% block js %}{% endblock %}
   </body>
 </html>
