@@ -11,30 +11,30 @@ from database import LegoDb
 
 DATABASE = 'test.db'
 
-def write_db(huilv):
+def write_db(exrate):
     cx = sqlite.connect(DATABASE)
     fields = ('usd', 'gbp', 'eur', 'cad', 'datetime')
-    data = ([huilv[field] for field in fields])
-    sql = u"insert into huilv (id,usd,gbp,eur,cad,datetime) \
+    data = ([exrate[field] for field in fields])
+    sql = u"insert into exrate (id,usd,gbp,eur,cad,datetime) \
         values (null,?,?,?,?,?)"
     cx.execute(sql, data)
     cx.commit()
     cx.close()
 
-def get_huilv_from_cmb():
+def get_exrate_from_cmb():
     cmb_url = 'http://fx.cmbchina.com/Hq/'
     html_waihui = urllib.urlopen(cmb_url).read()
-    huilv = parse_html(html_waihui)
-    return huilv
+    exrate = parse_html(html_waihui)
+    return exrate
 
-def get_huilv_from_cmb_test():
+def get_exrate_from_cmb_test():
     with open('test_waihui.html') as f:
-        huilv = parse_html(f.read())
-    return huilv
+        exrate = parse_html(f.read())
+    return exrate
 
 def parse_html(html):
     bs = BeautifulSoup(html)
-    huilv  = {}
+    exrate  = {}
     names = (
             (u'美元', u'usd'),
             (u'英镑', u'gbp'),
@@ -48,7 +48,7 @@ def parse_html(html):
         tds = [td.text.strip() for td in tr.find_all("td")]
         for name in waihui_names: 
             if tds[0] == name['name_zh']:
-                huilv[name['name_en']] = tds[5]
+                exrate[name['name_en']] = tds[5]
         #获得时间
         time = ''.join(tds[8].split(':'))
     #获得时间
@@ -57,34 +57,34 @@ def parse_html(html):
     for text in td_texts:
         if text.startswith(u"当前日期："):
             date = ''.join((text[5:9], text[10:12], text[13:15]))
-    huilv['datetime'] = ''.join((date, time))
+    exrate['datetime'] = ''.join((date, time))
 
     #TODO:验证数据
-    return huilv
+    return exrate
 
-def debug_print(huilv):
-    for i in huilv:
-        print i, huilv[i]
+def debug_print(exrate):
+    for i in exrate:
+        print i, exrate[i]
 
-def get_huilv_from_db():
+def get_exrate_from_db():
     db = LegoDb()
     db.connect_db()
-    huilv = db.query_huilv()
+    exrate = db.query_exrate()
     db.disconnect_db()
-    return huilv
+    return exrate
 
-def get_huilv():
-    huilv = get_huilv_from_db()
-    if not huilv:
-        huilv = get_huilv_from_cmb()
-    return huilv
+def get_exrate():
+    exrate = get_exrate_from_db()
+    if not exrate:
+        exrate = get_exrate_from_cmb()
+    return exrate
 
 if __name__ == '__main__':
     #init_db()
-    #huilv = get_huilv_from_cmb_test()
-    huilv = get_huilv_from_cmb()
-    debug_print(huilv)
-    write_db(huilv)
+    #exrate = get_exrate_from_cmb_test()
+    exrate = get_exrate_from_cmb()
+    debug_print(exrate)
+    write_db(exrate)
     
 
 

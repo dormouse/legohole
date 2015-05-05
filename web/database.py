@@ -23,7 +23,6 @@ class LegoDb():
         self.cx.close()
         
     def create_table(self, name):
-        self.connect_db()
         if name == 'brickset':
             self.cx.execute("drop table if exists brickset")
             init_sql = """create table brickset (
@@ -50,9 +49,9 @@ class LegoDb():
                     data_source text)"""
             self.cx.execute(init_sql)
 
-        if name == 'huilv':
-            self.cx.execute("drop table if exists huilv")
-            init_sql = """create table huilv (
+        if name == 'exrate':
+            self.cx.execute("drop table if exists exrate")
+            init_sql = """create table exrate (
                     id integer primary key,
                     usd text,
                     gbp text,
@@ -83,8 +82,6 @@ class LegoDb():
                     content text
                     )"""
             self.cx.execute(init_sql)
-
-        self.disconnect_db()
 
     def query_db(self, sql, args=(), one=False):
         cur = self.cx.execute(sql, args)
@@ -118,8 +115,8 @@ class LegoDb():
         #print args
         return self.query_db(sql, args, one)
 
-    def query_huilv(self):
-        sql = 'select * from huilv order by datetime desc'
+    def query_exrate(self):
+        sql = 'select * from exrate order by datetime desc'
         row = self.query_db(sql, one = True)
         return row
 
@@ -178,10 +175,10 @@ class LegoDb():
         fields = ('set_number', 'price', 'discount', 'vendor', 'datetime')
         self.append_db(table, fields, datas)
 
-    def append_huilv(self, datas):
-        """ append current huilv to db"""
+    def append_exrate(self, datas):
+        """ append current exrate to db"""
 
-        table = 'huilv'
+        table = 'exrate'
         fields = ('usd', 'gbp', 'eur', 'cad', 'datetime')
         self.append_db(table, fields, datas)
 
@@ -197,10 +194,10 @@ if __name__ == '__main__':
     db.connect_db()
     #LegoDb().create_view('brickset_number_view')
     #print db.query_brickset_by_set_number('60052-1')
-    #print db.query_huilv()
-    #db.create_table('price')
+    #print db.query_exrate()
+    db.create_table('exrate')
     #db.query_brickset(True, 'number', number=444)
-    print db.query_brickset(True, number='8088-1')
+    #print db.query_brickset(True, number='8088-1')
     #db.query_brickset(True)
     db.disconnect_db()
 

@@ -5,7 +5,7 @@ from urllib import urlopen
 from datetime import datetime
 
 import parse_brickset
-from waihui import get_huilv
+from waihui import get_exrate
 
 from database import LegoDb
 

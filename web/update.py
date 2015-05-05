@@ -11,17 +11,17 @@ from datetime import datetime
 
 from database import LegoDb
 
-def get_huilv_from_cmb():
-    """ get huilv from china merchants bank"""
+def get_exrate_from_cmb():
+    """ get exrate from china merchants bank"""
 
     cmb_url = 'http://fx.cmbchina.com/Hq/'
     html_waihui = urllib.urlopen(cmb_url).read()
-    huilv = parse_huilv_html(html_waihui)
-    return huilv
+    exrate = parse_exrate_html(html_waihui)
+    return exrate
 
-def parse_huilv_html(html):
+def parse_exrate_html(html):
     bs = BeautifulSoup(html)
-    huilv  = {}
+    exrate  = {}
     names = (
             (u'美元', u'usd'),
             (u'英镑', u'gbp'),
@@ -35,7 +35,7 @@ def parse_huilv_html(html):
         tds = [td.text.strip() for td in tr.find_all("td")]
         for name in waihui_names: 
             if tds[0] == name['name_zh']:
-                huilv[name['name_en']] = tds[5]
+                exrate[name['name_en']] = tds[5]
         #获得时间
         time = ''.join(tds[8].split(':'))
     #获得时间
@@ -44,10 +44,10 @@ def parse_huilv_html(html):
     for text in td_texts:
         if text.startswith(u"当前日期："):
             date = ''.join((text[5:9], text[10:12], text[13:15]))
-    huilv['datetime'] = ''.join((date, time))
+    exrate['datetime'] = ''.join((date, time))
 
     #TODO:验证数据
-    return huilv
+    return exrate
 
 def get_buy_uk():
     """get disc of amazon uk from briceset"""
@@ -94,10 +94,10 @@ def parse_buy_uk_tr(tr):
 
     return obj
 
-def get_huilv_from_db(local):
+def get_exrate_from_db(local):
     db = LegoDb()
     db.connect_db()
-    row = db.query_huilv()
+    row = db.query_exrate()
     db.disconnect_db()
     try:
         rate = float(row[local])/100
@@ -120,7 +120,7 @@ def calc_disc(price):
     db = LegoDb()
 
     #得到美元零售人民币价格
-    usd_rate = get_huilv_from_db('usd')
+    usd_rate = get_exrate_from_db('usd')
     if not usd_rate:
         return None
     db.connect_db()
@@ -134,7 +134,7 @@ def calc_disc(price):
     cp_rmb = None
     if price['local'] == 'uk':
         #得到英镑汇率
-        gbp_rate = get_huilv_from_db('gbp')
+        gbp_rate = get_exrate_from_db('gbp')
         if not gbp_rate:
             return None
         #英镑退税后人民币当前价格
@@ -163,22 +163,22 @@ def update_buy_uk():
     db.append_update_log(obj)
     db.disconnect_db()
 
-def update_huilv():
-    """ update huilv """
+def update_exrate():
+    """ update exrate """
 
     obj = {}
     db = LegoDb()
     db.connect_db()
     obj['start'] = datetime.now().strftime("%Y%m%d%H%M%S")
-    huilv = get_huilv_from_cmb()
-    db.append_huilv(huilv)
+    exrate = get_exrate_from_cmb()
+    db.append_exrate(exrate)
     obj['end'] = datetime.now().strftime("%Y%m%d%H%M%S")
-    obj['content'] = 'huilv'
+    obj['content'] = 'exrate'
     db.append_update_log(obj)
     db.disconnect_db()
 
 def update_db():
-    update_huilv()
+    update_exrate()
     update_buy_uk()
 
 def down_thumbs(prices):

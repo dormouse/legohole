@@ -16,7 +16,7 @@ import json
 
 import parse_brickset
 from database import LegoDb
-from cn_amazon_price import Amazon
+from amazon_price import Amazon
 
 DATABASE = '/home/dormouse/project/legohole/testdata/test.db'
 TABLE = 'brickset'
@@ -131,8 +131,8 @@ def get_body(price, local):
 
     if local == 'uk':
         #得到英镑退税后人民币当前价格
-        huilv = db.query_huilv()
-        gbp_rate = float(huilv['gbp'])/100
+        exrate = db.query_exrate()
+        gbp_rate = float(exrate['gbp'])/100
         obj['price_rmb'] = round(float(obj['price'])*gbp_rate/1.2, 2)
 
     return obj
@@ -154,8 +154,8 @@ def get_amazon_cn(set_number):
         us_rp = row.get('usprice')
     if us_rp:
         #得到汇率
-        huilv = db.query_huilv()
-        usd_rate = float(huilv['usd'])/100
+        exrate = db.query_exrate()
+        usd_rate = float(exrate['usd'])/100
         us_rp_rmb = float(us_rp) * usd_rate 
         disc = round(cn_cp_rmb/us_rp_rmb*100, 2) 
     if disc:
