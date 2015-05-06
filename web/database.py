@@ -3,7 +3,7 @@
 import csv
 import sqlite3 as sqlite
 import glob
-from datetime import datetime
+import datetime
 
 DATABASE = '/home/dormouse/project/legohole/testdata/test.db'
 
@@ -139,6 +139,21 @@ class LegoDb():
         rows = self.query_db(sql, args)
         return rows
 
+    def query_price_cp(self, set_number ,vendor):
+        """query lego current price within one hour"""
+
+        delta = datetime.timedelta(hours=-1)
+        now = datetime.datetime.now() + delta
+        hour_ago = now.strftime("%Y%m%d%H%M%S")
+        sql = """
+            SELECT * FROM price
+            WHERE datetime>=? AND set_number=? AND vendor=?
+            ORDER BY price
+        """
+        args = (hour_ago, set_number, vendor)
+        row = self.query_db(sql, args, one=True)
+        return row
+
     def query_update_log(self,content):
         sql = "select * from update_log where content = ? order by end desc"
         args = (content,)
@@ -189,13 +204,55 @@ class LegoDb():
         fields = ('start', 'end', 'content')
         self.append_db(table, fields, datas)
 
+    def calc_disc(self, set_number, CC, amount):
+        """
+        function:
+            calc discount
+        usage:
+            db = LegoDb()
+            db.connect_db()
+            print db.calc_disc('60068-1','CNY','500.20')
+            db.disconnect_db()
+        arg:
+            set_number: the set number of lego item(e.g. 8088-1)
+            CC:CurrencyCode(e.g. CNY)
+            amount: amount of price(e.g. 123.00)
+        return:
+            discount:type is float, compare with us rrp (e.g. 57.01)
+        """
+        #check args
+        #check set_number
+        #check CC
+        cc = CC.lower()
+        #check amount
+        try:
+            amount = float(amount)
+        except:
+            return None
+
+        row = self.query_brickset(True, 'usprice', number=set_number)
+        rate = self.query_exrate()
+        if row and row['usprice']:
+            us_rrp_rmb = float(row['usprice']) * float(rate['usd'])/100
+        else:
+            return None
+
+        if cc == u'cny':
+            rrp_rmb = amount
+        else:
+            rrp_rmb = amount*float(rate[cc])/100
+
+        disc = round(rrp_rmb/us_rrp_rmb*100, 2)
+        return disc
+
 if __name__ == '__main__':
     db = LegoDb()
     db.connect_db()
     #LegoDb().create_view('brickset_number_view')
     #print db.query_brickset_by_set_number('60052-1')
     #print db.query_exrate()
-    db.create_table('exrate')
+    #db.create_table('exrate')
+    print db.calc_disc('60068-1','CNY','500.20')
     #db.query_brickset(True, 'number', number=444)
     #print db.query_brickset(True, number='8088-1')
     #db.query_brickset(True)

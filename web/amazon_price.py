@@ -151,7 +151,9 @@ class Amazon():
         #for debug
         self.logger.debug(url)
         self.logger.debug(price)
-        if not price:
+        if price:
+            pass
+        else:
             self.logger.debug(xml)
 
         return price

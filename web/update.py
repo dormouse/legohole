@@ -94,18 +94,6 @@ def parse_buy_uk_tr(tr):
 
     return obj
 
-def get_exrate_from_db(local):
-    db = LegoDb()
-    db.connect_db()
-    row = db.query_exrate()
-    db.disconnect_db()
-    try:
-        rate = float(row[local])/100
-    except:
-        print "can not get %s exchange rate"%local
-        rate = None
-    return rate
-
 def calc_disc(price):
     """ calc discount"""
 
@@ -118,35 +106,12 @@ def calc_disc(price):
         return None
 
     db = LegoDb()
-
-    #得到美元零售人民币价格
-    usd_rate = get_exrate_from_db('usd')
-    if not usd_rate:
-        return None
     db.connect_db()
-    row = db.query_brickset(True, 'usprice', number=number)
-    db.disconnect_db()
-    if row and row['usprice']:
-        us_rp_rmb = float(row['usprice'])*usd_rate
-    else:
-        return None
-
-    cp_rmb = None
+    CC = {'uk':'gbp','cn':'cny'}
     if price['local'] == 'uk':
-        #得到英镑汇率
-        gbp_rate = get_exrate_from_db('gbp')
-        if not gbp_rate:
-            return None
-        #英镑退税后人民币当前价格
-        cp_rmb = cp*gbp_rate/1.2
-
-    if price['local'] == 'cn':
-        cp_rmb = cp
-
-    if cp_rmb:
-        disc = round(cp_rmb/us_rp_rmb*100, 2) 
-    else:
-        disc = None
+        #tax back
+        amount = cp/1.2
+    disc = db.calc_disc(number, CC[price['local']], amount)
     return disc 
 
 def update_buy_uk():

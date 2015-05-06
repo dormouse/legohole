@@ -15,6 +15,7 @@ from flask import Flask, request, session, g, redirect, url_for, abort, \
 import json
 
 import parse_brickset
+import datetime
 from database import LegoDb
 from amazon_price import Amazon
 
@@ -139,16 +140,26 @@ def get_body(price, local):
 
 @app.route('/ajax/get_amazon_cn/number/<set_number>')
 def get_amazon_cn(set_number):
-    number = set_number.split('-')[0]
-    amazon = Amazon(KEYFILE)
-    price = amazon.get_lego_price('CN', number=number)
-    if not price:
-        return 'No'
+    db = LegoDb(g.db)
+    vendor = 'amazon_cn'
 
-    cn_cp_rmb = float(price)/100
+    #check cached price
+    row = db.query_price_cp(set_number ,vendor)
+    if row:
+        #we have cached price
+        cn_cp_rmb = float(row['price'])
+    else:
+        #we have no cached price, get from amazon.cn
+        number = set_number.split('-')[0]
+        amazon = Amazon(KEYFILE)
+        price = amazon.get_lego_price('CN', number=number)
+        if price:
+            cn_cp_rmb = float(price)/100
+        else:
+            return 'No'
 
     #计算折扣
-    db = LegoDb(g.db)
+    disc = None
     row = db.query_brickset(True, number=set_number)
     if row:
         us_rp = row.get('usprice')
@@ -162,6 +173,15 @@ def get_amazon_cn(set_number):
         formated_price = u"￥%.2f(%.2f%%)"%(cn_cp_rmb, disc)
     else:
         formated_price = u"￥%.2f"%cn_cp_rmb
+
+    #write price to db
+    db.append_prices({
+        'set_number': set_number,
+        'price': cn_cp_rmb,
+        'discount': disc,
+        'vendor': vendor,
+        'datetime': datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+    })
     return formated_price
 
 @app.route('/set/number/<set_number>')

@@ -13,7 +13,9 @@
             {% endfor %}
                 <tr>
                     <td>中亚价格</td>
-                    <td id='Z_cn_p'>正在查询</td>
+                    <td id='Z_cn_p'>
+                        
+                    </td>
                 </tr>
             </table>
         </div>
@@ -37,7 +39,7 @@
 <script type="text/javascript">
 
 $(document).ready(function() {
-    $("#Z_cn_p").html( 'please wait.......' ) ;
+    $("#Z_cn_p").html('<span class="glyphicon glyphicon-time" aria-hidden="true"></span>') ;
     $.ajax({
         type: "get",
         url: "/ajax/get_amazon_cn/number/{{ objs.show_items[0]['value'] }}",

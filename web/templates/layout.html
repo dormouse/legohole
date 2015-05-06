@@ -10,7 +10,7 @@
     <title>Lego Hole</title>
 
     <!-- Bootstrap core CSS -->
-    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='bootstrap.min.css') }}">
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
     <!-- Custom styles for this template -->
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='dashboard.css') }}">
   </head>
@@ -67,7 +67,7 @@
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
     {% block js %}{% endblock %}
   </body>
 </html>
