@@ -153,6 +153,7 @@ def down_thumbs(prices):
         download(url, target_path)
     #http://images.brickset.com/sets/images/70706-1.jpg
     #http://images.brickset.com/sets/large/70706-1.jpg
+
 def make_thumb_url(set_number):
     imgurl = ''.join(
         ('http://images.brickset.com/sets',

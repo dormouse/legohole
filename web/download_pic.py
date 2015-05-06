@@ -14,10 +14,12 @@ from database import LegoDb
 def down_thumbs(set_numbers):
     random.seed()
     time.sleep(random.random()*10)
-    urls = [make_thumb_url(set_number) for set_number in set_numbers]
-    target_path = "/home/dormouse/project/legohole/web/static/pic/thumb"
-    for url in urls:
-        download(url, target_path)
+    thumb_urls = [make_thumb_url(set_number) for set_number in set_numbers]
+    thumb_target_path = "/home/dormouse/project/legohole/web/static/pic/thumb"
+    image_urls = [make_image_url(set_number) for set_number in set_numbers]
+    image_target_path = "/home/dormouse/project/legohole/web/static/pic/image"
+    for url in image_urls:
+        download(url, image_target_path)
     #http://images.brickset.com/sets/images/70706-1.jpg
     #http://images.brickset.com/sets/large/70706-1.jpg
 
@@ -25,6 +27,12 @@ def make_thumb_url(set_number):
     imgurl = ''.join(
         ('http://images.brickset.com/sets',
          '/thumbs/tn_%s_jpg.jpg'%set_number))
+    return imgurl
+
+def make_image_url(set_number):
+    imgurl = ''.join((
+        'http://images.brickset.com/sets',
+        '/images/%s.jpg'%set_number))
     return imgurl
 
 def download(url, target_path):
@@ -37,8 +45,8 @@ def download_pics():
     db.connect_db()
     rows = db.query_brickset(False, 'number')
     numbers = [row['number'] for row in rows]
-    down_thumbs(numbers)
     db.disconnect_db()
+    down_thumbs(numbers)
 
 if __name__ == '__main__':
     download_pics()
