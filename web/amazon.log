@@ -117,3 +117,11 @@
 2015-05-06 13:20:34,194 - amazon_price - DEBUG - http://webservices.amazon.cn/onca/xml?AWSAccessKeyId=AKIAIHHC2SWWWSHKD7JA&AssociateTag=mousecat-23&Keywords=lego%2060068&Operation=ItemSearch&ResponseGroup=ItemAttributes%2COfferFull&SearchIndex=Toys&Service=AWSECommerceService&Timestamp=2015-05-06T13%3A20%3A31Z&Version=2011-08-01&Signature=Cy0N4ELUkkP6iEIEwWVP0wpB3QVoX%2FsWo8l3tynwX4o%3D
 2015-05-06 13:20:34,196 - amazon_price - DEBUG - 50020
 2015-05-06 13:20:34,196 - amazon_price - DEBUG - 50020
+2015-05-07 13:06:07,808 - amazon_price - DEBUG - http://webservices.amazon.cn/onca/xml?AWSAccessKeyId=AKIAIHHC2SWWWSHKD7JA&AssociateTag=mousecat-23&Keywords=lego%2075083&Operation=ItemSearch&ResponseGroup=ItemAttributes%2COfferFull&SearchIndex=Toys&Service=AWSECommerceService&Timestamp=2015-05-07T13%3A06%3A04Z&Version=2011-08-01&Signature=83ePh94F7M3FgLLu0QA6Ly3bwmMrpdq7JxupSsr98QQ%3D
+2015-05-07 13:06:07,848 - amazon_price - DEBUG - 63900
+2015-05-07 22:14:01,909 - amazon_price - DEBUG - http://webservices.amazon.cn/onca/xml?AWSAccessKeyId=AKIAIHHC2SWWWSHKD7JA&AssociateTag=mousecat-23&Keywords=lego%2010572&Operation=ItemSearch&ResponseGroup=ItemAttributes%2COfferFull&SearchIndex=Toys&Service=AWSECommerceService&Timestamp=2015-05-07T22%3A13%3A59Z&Version=2011-08-01&Signature=VzDI%2Bg6%2FLGpzIqjZ1jOow%2FVf9AAsEIHkKjzPBFbCnBY%3D
+2015-05-07 22:14:01,945 - amazon_price - DEBUG - 29000
+2015-05-09 08:55:08,658 - amazon_price - DEBUG - http://webservices.amazon.cn/onca/xml?AWSAccessKeyId=AKIAIHHC2SWWWSHKD7JA&AssociateTag=mousecat-23&Keywords=lego%2010572&Operation=ItemSearch&ResponseGroup=ItemAttributes%2COfferFull&SearchIndex=Toys&Service=AWSECommerceService&Timestamp=2015-05-09T08%3A52%3A19Z&Version=2011-08-01&Signature=vHS2JYWVPNZq%2FThm%2FNYFpUwlakYW1jnXc5tgItxTK0w%3D
+2015-05-09 08:55:08,658 - amazon_price - DEBUG - http://webservices.amazon.cn/onca/xml?AWSAccessKeyId=AKIAIHHC2SWWWSHKD7JA&AssociateTag=mousecat-23&Keywords=lego%2010572&Operation=ItemSearch&ResponseGroup=ItemAttributes%2COfferFull&SearchIndex=Toys&Service=AWSECommerceService&Timestamp=2015-05-09T08%3A52%3A19Z&Version=2011-08-01&Signature=vHS2JYWVPNZq%2FThm%2FNYFpUwlakYW1jnXc5tgItxTK0w%3D
+2015-05-09 08:55:09,019 - amazon_price - DEBUG - 29000
+2015-05-09 08:55:09,019 - amazon_price - DEBUG - 29000
