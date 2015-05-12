@@ -12,6 +12,8 @@ from urllib import urlopen
 
 from database import LegoDb
 
+#获得中国亚马逊LEGO的价格
+
 START = """
 http://www.amazon.cn/s/ref=sr_nr_p_n_fulfilled_by_ama_0?fst=as%3Aoff&rh=i%3Aaps%2Ck%3Alego%2Cp_89%3ALEGO+%E4%B9%90%E9%AB%98%2Cp_n_fulfilled_by_amazon%3A326314071&keywords=lego&ie=UTF8
 """
