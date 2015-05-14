@@ -136,6 +136,8 @@ class LegoDb():
             'join brickset on brickset.number = price.set_number',
             ' and '.join(wheres),
             'ORDER BY discount',])
+        print sql
+        print args
         rows = self.query_db(sql, args)
         return rows
 
@@ -175,19 +177,20 @@ class LegoDb():
         ])
 
         if isinstance(datas, list):
-            args = [([data[field] for field in fields]) for data in datas]
+            args = [([data.get(field) for field in fields]) for data in datas]
             self.cx.executemany(sql, args)
         else:
             for data in datas:
-                args = ([datas[field] for field in fields])
-                self.cx.execute(sql, args)
+                args = ([datas.get(field) for field in fields])
+            self.cx.execute(sql, args)
         self.cx.commit()
 
     def append_prices(self, datas):
         """append price to db"""
 
         table = 'price'
-        fields = ('set_number', 'price', 'discount', 'vendor', 'datetime')
+        fields = ('set_number', 'price', 'discount', 'vendor',
+                  'datetime', 'asin', 'item_url', 'title')
         self.append_db(table, fields, datas)
 
     def append_exrate(self, datas):
