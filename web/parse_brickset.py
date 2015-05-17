@@ -163,14 +163,14 @@ def parse_set(html):
         #英寸
         str_tmp = clean(dd.contents[2])[1:-3]
         ins = [float(clean(i)) for i in str_tmp.split('x')]
-        set_details['Dimensions'] = { 'cm':cms, 'in':ins }
+        set_details['Dimensions'] = {'cm': cms, 'in': ins }
                     
     if u'Weight' in dt_strings:
         weight_str = dd_strings[dt_strings.index('Weight')]
         str_tmp = weight_str.split('Kg')
         kg = float(clean(str_tmp[0]))
         lb = float(clean(str_tmp[1].split('lb')[0])[1:])
-        set_details['Weight'] = { 'kg':kg, 'lb':lb }
+        set_details['Weight'] = {'kg': kg, 'lb': lb }
 
     if u'Barcodes' in dt_strings:
         dd = dds[dt_strings.index('Barcodes')]
@@ -183,7 +183,8 @@ def parse_set(html):
 
     {u'Set number': u'70155-1',
     u'Price per piece': u'13.500p / 17.554c / 20.257c',
-    u'Name': u'Inferno Pit', u'Weight': {'lb': 0.33, 'kg': 0.15},
+    u'Name': u'Inferno Pit',
+    u'Weight': {'lb': 0.33, 'kg': 0.15},
     u'Year released': u'2014',
     u'Minifigs': {
         'count': 1,
@@ -204,10 +205,12 @@ def parse_set(html):
     u'Pieces': {'count': 74,
         'link': 'http://brickset.com/inventories/70155-1'
     },
-    u'Set type': u'Normal', u'Theme': u'Legends of Chima',
+    u'Set type': u'Normal',
+    u'Theme': u'Legends of Chima',
     u'Age range': {'start': 7, 'end': 14},
     u'Dimensions': {'cm': [28.2, 24.2, 5.4], 'in': [11.1, 9.5, 2.1]},
-    u'Theme group': u'Action/Adventure', u'Rating': None,
+    u'Theme group': u'Action/Adventure',
+    u'Rating': None,
     u'Barcodes': {'upc': u'673419211024', 'ean': u'5702015124744'},
     u'Availability': u'Retail',
     u'RRP': {'usd': 12.99, 'gbp': 9.99, 'eur': 14.99}}

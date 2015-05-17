@@ -1,0 +1,4 @@
+2015-05-15 10:14:00,405 - __main__ - DEBUG - http://webservices.amazon.com/onca/xml?AWSAccessKeyId=AKIAIHHC2SWWWSHKD7JA&AssociateTag=mousecat-20&IdType=ASIN&ItemId=B00NHQIHOK%2CB00NHQFTJQ&MerchantId=Amazon&Operation=ItemLookup&ResponseGroup=Large&Service=AWSECommerceService&Timestamp=2015-05-15T10%3A13%3A40Z&Version=2011-08-01&Signature=estHdK%2FuXEsB6IGAo8J9t9n4rSDyWpErYQEtgYGoWT0%3D
+2015-05-15 10:14:00,405 - __main__ - DEBUG - 7899
+2015-05-17 12:12:37,150 - amazon_price - DEBUG - http://webservices.amazon.cn/onca/xml?AWSAccessKeyId=AKIAIHHC2SWWWSHKD7JA&AssociateTag=mousecat-23&Keywords=lego%2060002&Operation=ItemSearch&ResponseGroup=Large&SearchIndex=Toys&Service=AWSECommerceService&Timestamp=2015-05-17T12%3A12%3A33Z&Version=2011-08-01&Signature=tm%2FCv6hhfJ90zIXokiWsosvnH8jkRF5PoWF7oJYK%2FY8%3D
+2015-05-17 12:12:37,173 - amazon_price - DEBUG - 16500

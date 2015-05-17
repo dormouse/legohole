@@ -1,13 +1,18 @@
 # !/usr/bin/env python
 # -*- coding: UTF-8 -*
-from bs4 import BeautifulSoup
-from datetime import datetime
-import urllib
-from dateutil import tz
+
+import base64
 import hmac
 import hashlib
-import base64
 import logging
+import os
+import urllib
+
+from bs4 import BeautifulSoup
+from datetime import datetime
+from dateutil import tz
+
+DEBUG = True
 
 class Amazon():
     """查询 amazon 网站"""
@@ -33,9 +38,7 @@ class Amazon():
             with open(key_file) as f:
                 texts = f.read().split()
                 self.AWS_keys = dict(zip(
-                    ('AWS_access_key_id', 'AWS_secret_key'),
-                    texts
-                ))
+                    ('AWS_access_key_id', 'AWS_secret_key'), texts))
         except:
             self.logger.error('can not open key file!')
 
@@ -125,7 +128,7 @@ class Amazon():
     def get_lego_price(self, local, **args):
 
         # default pars
-        pars = {'ResponseGroup':'ItemAttributes,OfferFull'}
+        pars = {'ResponseGroup':'Large'}
         # search by ASIN
         if args.get('ASIN'):
             pars.update({
@@ -158,8 +161,17 @@ class Amazon():
 
         return price
 
-    def save_xml(self, fname, xml):
-        with open(fname, 'w') as f:
+    def save_xml(self, xml):
+        """Save xml file content.
+        File name is "{utctime}.xml"
+
+        :xml: xml content
+        """
+
+        base_path = '/home/dormouse/project/legohole/testdata' 
+        utc_time = self.get_utctime()
+        file_name = os.path.join(base_path, utc_time+'.xml')
+        with open(file_name, 'w') as f:
             f.write(xml)
             
     def test_text(self, fname):
@@ -170,6 +182,9 @@ class Amazon():
 
     def parse_xml(self, xml):
         """分析中国亚马逊搜索页面"""
+        if DEBUG:
+            self.save_xml(xml)
+
         soup = BeautifulSoup(xml, "xml")
         offers = soup.find_all('Offer')
         if offers:
@@ -189,10 +204,10 @@ class Amazon():
 if __name__ == "__main__":
     key_file = '/home/dormouse/project/legohole/web/rootkey.csv'
     amazon = Amazon(key_file)
-    amazon.get_lego_price('CN', number='60044')
-    amazon.get_lego_price('US', number='60046')
-    amazon.get_lego_price('UK', number='60044')
-    #print amazon.get_lego_price('US', ASIN='B00GSPF9QQ') 
+    #amazon.get_lego_price('CN', number='60044')
+    #amazon.get_lego_price('US', number='60046')
+    #amazon.get_lego_price('UK', number='60044')
+    amazon.get_lego_price('US', ASIN='B00NHQIHOK,B00NHQFTJQ') 
     #print amazon.get_lego_price('CN', ASIN='B00VG1X1JY') 
     #fname = '/home/dormouse/project/legohole/testdata/amazon_cn.xml'
     #Amazon().test_text(fname)
