@@ -46,7 +46,8 @@
             <li><a href="{% url 'legosets:discount' %}">discount</a></li>
             <li><a href="#">Help</a></li>
           </ul>
-          <form class="navbar-form navbar-right" action="/search" method="post">
+          <form class="navbar-form navbar-right" action="{% url 'legosets:search' %}" method="post">
+            {% csrf_token %}
             <input type="text" name = "setnumber" class="form-control"
               placeholder="Search...">
           </form>

@@ -6,6 +6,9 @@ class LegoSet(models.Model):
     add_datetime = models.DateTimeField(auto_now_add=True)
     modi_datetime = models.DateTimeField(auto_now=True)
 
+    def __unicode__(self):
+        return self.number + ' # ' + self.name
+        
 class Vendor(models.Model):
     name = models.CharField(max_length=200)
 

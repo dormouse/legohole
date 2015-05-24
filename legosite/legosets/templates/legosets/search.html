@@ -1,0 +1,13 @@
+{% extends "legosets/layout.html" %}
+
+{% block content %}
+
+<h1>Search Result</h1>
+
+{% if sets %}
+    {% include "legosets/set_list.html" %}
+{% else %}
+    No Resutl!
+{% endif %}
+
+{% endblock %}
