@@ -1,0 +1,57 @@
+{% extends "legosets/layout.html" %}
+
+{% block sidebar %}
+<div class="col-sm-3 col-md-2 sidebar">
+    <h3>{{ objs.title }}</h3>
+    <ul class="nav nav-sidebar">
+        <li class="active">
+            <a href="#">折扣<span class="sr-only">(current)</span></a>
+        </li>
+        <li class ="list-group-item-info">
+        <a href="#">70</a>
+        </li>
+        <li class ="list-group-item-info">
+        <a href="#">100</a>
+        </li>
+    </ul>
+
+    <ul class="nav nav-sidebar">
+        <li><a href="#">更新时间：test</a></li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block content %}
+
+<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>discount</th>
+                <th>name</th>
+                <th>vendor</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for set in discount %}
+
+            <tr>
+                <td>
+                    <a href="{% url 'legosets:detail' set.id %}">
+                        {{ set.id }}
+                    </a>
+                </td>
+                <td>{{ set.discount }}</td>
+                <td>{{ set.legoset.name }}</td>
+                <td>{{ set.vendor.name }}</td>
+            <tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
+
+
+

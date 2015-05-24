@@ -1,0 +1,25 @@
+{% if objs.table_body %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            {% for item in objs.table_head %}
+            <th>{{ item }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in objs.table_body %}
+        <tr>
+            <td>
+                <a href = "/set/id/{{ row[0] }}">{{ row[1] }}</a>
+            </td>
+            {% for item in row[2:] %}
+            <td>{{ item }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<em>啥也找不到啊。。。</em>
+{% endif %}

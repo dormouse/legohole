@@ -61,6 +61,20 @@ class LegoDb():
                     )"""
             self.cx.execute(init_sql)
 
+        if name == 'bshtml':
+            #raw html of brickset
+            self.cx.execute("drop table if exists bshtml")
+            init_sql = """create table bshtml (
+                    id integer primary key,
+                    status_code INTEGER,
+                    lego_number text,
+                    url text,
+                    html text,
+                    datetime text,
+                    tag text
+                    )"""
+            self.cx.execute(init_sql)
+
         if name == 'price':
             self.cx.execute("drop table if exists price")
             init_sql = """CREATE TABLE "price" (
